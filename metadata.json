@@ -1,0 +1,5 @@
+{
+  "name": "LuxeDrive - Premium Car Rentals",
+  "description": "A high-end car rental agency offering a futuristic and trustworthy experience with a curated fleet of luxury vehicles.",
+  "requestFramePermissions": ["geolocation"]
+}

@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-brand-blue: #0A192F;
+  --color-brand-accent: #00D2FF;
+  --color-brand-deep: #020617;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-deep text-slate-200 font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
+  }
+}
+
+.glass-card {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl;
+}
+
+.blue-glow {
+  box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+}
+
+.blue-glow-hover:hover {
+  box-shadow: 0 0 30px rgba(0, 210, 255, 0.4);
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-brand-deep;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  :root {
+    --bg-nav: rgba(2, 6, 23, 0.85);
+    --bg-dropdown: #0f172a;
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --border: rgba(255, 255, 255, 0.1);
+  }
+
+  [data-theme='showroom'] {
+  --color-bg: #f8fafc; /* This is the white/off-white color */
+  --color-text: #020617;
+  --color-text-muted: #64748b;
+  --color-border: rgba(0, 0, 0, 0.08);
+}
+}
+
+:root {
+  --bg-body: #020617;
+  --text-main: #ffffff;
+  --card-bg: #0f172a;
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='showroom'] {
+  --bg-body: #f8fafc;
+  --text-main: #020617;
+  --card-bg: #ffffff;
+  --border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Apply variables to the body */
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  transition: all 0.5s ease; /* Makes the whole site fade between themes */
+}
+
+@layer utilities {
+  .glass-card {
+    background: linear-gradient(145deg, rgba(21, 25, 33, 0.8) 0%, rgba(11, 14, 20, 0.9) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .bg-dashboard { background-color: #0B0E14; }
+  .bg-card { background-color: #151921; }
+  .glass-border { border: 1px solid rgba(255, 255, 255, 0.05); }
+  .neon-glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
+  .text-porsche { font-family: 'Inter', sans-serif; letter-spacing: -0.05em; }
+  .blue-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+  }
+
+  .text-gradient {
+    background: linear-gradient(to right, #ffffff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}

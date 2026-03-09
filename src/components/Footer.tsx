@@ -1,0 +1,172 @@
+import React, { useRef, useEffect } from 'react';
+import { Car, Instagram, Twitter, Facebook, Linkedin, ArrowUp, ChevronRight, Send } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+export default function Footer() {
+  const footerRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const bottomBarRef = useRef<HTMLDivElement>(null);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: footerRef.current,
+          start: "top 85%", // Triggers right as the footer enters the screen
+          toggleActions: "play none none reverse",
+        }
+      });
+
+      // 1. Stagger in the 4 main columns
+      if (gridRef.current) {
+        tl.fromTo(gridRef.current.children,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: "power3.out" }
+        );
+      }
+
+      // 2. Fade in the bottom copyright bar and Back to Top button
+      tl.fromTo(bottomBarRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.8, ease: "power2.out" },
+        "-=0.4"
+      );
+    }, footerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <footer ref={footerRef} className="relative bg-[#020617] pt-24 pb-8 overflow-hidden border-t border-white/5">
+      
+      {/* --- AMBIENT GROUND GLOW --- */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[300px] bg-brand-accent/5 blur-[150px] pointer-events-none rounded-full" />
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        
+        {/* --- MAIN FOOTER GRID --- */}
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">
+          
+          {/* Column 1: Brand (Takes up more space) */}
+          <div className="lg:col-span-4 flex flex-col items-start pr-8">
+            <div className="flex items-center gap-3 mb-8 group cursor-pointer" onClick={scrollToTop}>
+              <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(var(--brand-accent-rgb),0.5)] group-hover:scale-105 transition-transform duration-300">
+                <Car className="text-[#020617]" size={24} />
+              </div>
+              <span className="text-2xl font-display font-black tracking-widest text-white">
+                LUXE<span className="text-brand-accent">DRIVE</span>
+              </span>
+            </div>
+            
+            <p className="text-slate-400 leading-relaxed font-light mb-8 max-w-sm">
+              The world's leading luxury automotive experience. Providing unrestricted access to the most prestigious vehicles since 2015.
+            </p>
+            
+            {/* Social Icons with Magnetic/Glow Hover */}
+            <div className="flex gap-4">
+              {[Instagram, Twitter, Facebook, Linkedin].map((Icon, i) => (
+                <a 
+                  key={i} 
+                  href="#" 
+                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 transition-all duration-300 hover:-translate-y-1 hover:bg-brand-accent hover:text-[#020617] hover:shadow-[0_5px_15px_rgba(var(--brand-accent-rgb),0.4)] hover:border-brand-accent"
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div>
+          </div>
+          
+          {/* Column 2: Quick Links */}
+          <div className="lg:col-span-2">
+            <h4 className="text-white font-display font-bold mb-6 tracking-wide">Quick Links</h4>
+            <ul className="space-y-4">
+              {['Home', 'Our Fleet', 'The Standard', 'Request Allocation', 'Contact'].map((item, i) => (
+                <li key={i}>
+                  <a href="#" className="group flex items-center text-slate-400 hover:text-white transition-colors duration-300 font-light">
+                    <ChevronRight size={14} className="opacity-0 -ml-4 mr-2 text-brand-accent transition-all duration-300 group-hover:opacity-100 group-hover:ml-0" />
+                    <span className="group-hover:translate-x-1 transition-transform duration-300">{item}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Column 3: Fleet */}
+          <div className="lg:col-span-2">
+            <h4 className="text-white font-display font-bold mb-6 tracking-wide">Categories</h4>
+            <ul className="space-y-4">
+              {['The Purist', 'The Executive', 'The Maverick', 'The Commander', 'The Visionary'].map((item, i) => (
+                <li key={i}>
+                  <a href="#" className="group flex items-center text-slate-400 hover:text-white transition-colors duration-300 font-light">
+                    <ChevronRight size={14} className="opacity-0 -ml-4 mr-2 text-brand-accent transition-all duration-300 group-hover:opacity-100 group-hover:ml-0" />
+                    <span className="group-hover:translate-x-1 transition-transform duration-300">{item}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Column 4: Newsletter */}
+          <div className="lg:col-span-4">
+            <h4 className="text-white font-display font-bold mb-6 tracking-wide">The Inner Circle</h4>
+            <p className="text-slate-400 mb-6 text-sm font-light leading-relaxed">
+              Subscribe to receive exclusive access to off-market additions and private driving events.
+            </p>
+            
+            <form className="space-y-4">
+              <div className="relative">
+                <input 
+                  type="email" 
+                  placeholder="Enter your email address"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white font-light focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent focus:bg-white/10 transition-all duration-300 placeholder:text-slate-500"
+                />
+              </div>
+              <button 
+                type="button"
+                className="w-full relative overflow-hidden rounded-xl bg-white px-6 py-3.5 font-bold text-[#020617] transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] group flex items-center justify-center gap-2"
+              >
+                {/* Diagonal Shine */}
+                <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+                  <div className="relative h-full w-8 bg-white/40" />
+                </div>
+                <span className="relative z-10 text-sm tracking-wide uppercase">Request Access</span>
+                <Send size={16} className="relative z-10 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+              </button>
+            </form>
+          </div>
+        </div>
+        
+        {/* --- BOTTOM BAR --- */}
+        <div ref={bottomBarRef} className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+          
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-sm text-slate-500 font-light">
+            <p>© 2026 LuxeDrive. All rights reserved.</p>
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-brand-accent transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-brand-accent transition-colors">Terms of Service</a>
+            </div>
+          </div>
+
+          <button 
+            onClick={scrollToTop}
+            className="group flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm font-semibold uppercase tracking-widest"
+          >
+            Back to Top
+            <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-brand-accent group-hover:text-[#020617] group-hover:border-brand-accent group-hover:-translate-y-1 transition-all duration-300 shadow-lg">
+              <ArrowUp size={16} />
+            </div>
+          </button>
+          
+        </div>
+
+      </div>
+    </footer>
+  );
+}
