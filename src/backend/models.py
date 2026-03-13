@@ -1,9 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 
-# 1. Initialize the db object HERE first
 db = SQLAlchemy()
 
-# 2. Now you can use db.Model because 'db' is defined above
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -12,8 +10,42 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
 
     def to_dict(self):
+        return {"id": self.id, "username": self.username, "email": self.email}
+
+class Car(db.Model):
+    __tablename__ = 'cars'
+    id = db.Column(db.Integer, primary_key=True)
+    brand = db.Column(db.String(50))
+    name = db.Column(db.String(100))
+    price_per_day = db.Column(db.Integer)
+    image_url = db.Column(db.String(500))
+    status = db.Column(db.String(20), default="Available")
+    seats = db.Column(db.Integer)
+    fuel = db.Column(db.String(50))
+    transmission = db.Column(db.String(50))
+
+    def to_dict(self):
         return {
-            "id": self.id, 
-            "username": self.username, 
-            "email": self.email
+            "id": self.id, "brand": self.brand, "name": self.name,
+            "pricePerDay": self.price_per_day, "image": self.image_url,
+            "status": self.status, 
+            "specs": {"seats": self.seats, "fuel": self.fuel, "transmission": self.transmission}
+        }
+
+class Reservation(db.Model):
+    __tablename__ = 'reservations'
+    id = db.Column(db.String(20), primary_key=True)
+    car_name = db.Column(db.String(100))
+    client_name = db.Column(db.String(100))
+    client_email = db.Column(db.String(120))
+    start_date = db.Column(db.String(20))
+    end_date = db.Column(db.String(20))
+    total_price = db.Column(db.Integer)
+    status = db.Column(db.String(20), default="Pending")
+
+    def to_dict(self):
+        return {
+            "id": self.id, "carName": self.car_name, "clientName": self.client_name,
+            "clientEmail": self.client_email, "startDate": self.start_date,
+            "endDate": self.end_date, "totalPrice": self.total_price, "status": self.status
         }
