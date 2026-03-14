@@ -3,37 +3,41 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import benzPic from '../../asset/benz.jpeg';
+import rangePic from '../../asset/range.avif';
+import trocPic from '../../asset/troc.jpeg';
+import tucsonPic from '../../asset/tucson.jpeg';
+import golfPic from '../../asset/golf.jpg';
 const CATEGORIES = [
   {
     id: 'performance',
     title: 'The Purist',
     subtitle: 'Unfiltered, track-ready adrenaline.',
-    image: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&q=80&w=2000',
+    image: benzPic,
   },
   {
     id: 'luxury',
     title: 'The Executive',
     subtitle: 'Uncompromising comfort and prestige.',
-    image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=2000',
+    image: rangePic,
   },
   {
     id: 'exotic',
     title: 'The Maverick',
     subtitle: 'Exotic aesthetics and raw, untamed power.',
-    image: 'https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=2000',
+    image: trocPic,
   },
   {
     id: 'suv',
     title: 'The Commander',
     subtitle: 'Absolute dominance on any terrain.',
-    image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    image: tucsonPic,
   },
   {
     id: 'electric',
     title: 'The Visionary',
     subtitle: 'The silent, blistering future of driving.',
-    image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80&w=2000',
+    image: golfPic,
   }
 ];
 

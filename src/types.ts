@@ -2,14 +2,14 @@ import rangePic from '../asset/range.avif';
 import trocPic from '../asset/troc.jpeg';
 import benzPic from '../asset/benz.jpeg';
 import tucsonPic from '../asset/tucson.jpeg';
-
+import golfPic from '../asset/golf.jpg';
 // --- INTERFACES ---
 
 export interface Car {
   id: string;
   name: string;
   brand: string;
-  type: 'Luxury' | 'Sport' | 'SUV' | 'Electric';
+  type: 'Luxury' | 'Sport' | 'SUV' | 'Electric' | 'Performance';
   pricePerDay: number;
   image: string;
   specs: {
@@ -51,9 +51,9 @@ export interface Testimonial {
 export const CARS: Car[] = [
   {
     id: '1',
-    name: 'Model S Plaid',
-    brand: 'Tesla',
-    type: 'Electric',
+    name: 'Range Rover SV',
+    brand: 'Land Rover',
+    type: 'Sport',
     pricePerDay: 250,
     image: rangePic,
     status: 'Available',
@@ -67,8 +67,8 @@ export const CARS: Car[] = [
   },
   {
     id: '2',
-    name: '911 Carrera',
-    brand: 'Porsche',
+    name: 'Volkswagen T-Roc',
+    brand: 'Volkswagen',
     type: 'Sport',
     pricePerDay: 450,
     image: trocPic,
@@ -100,8 +100,8 @@ export const CARS: Car[] = [
   },
   {
     id: '4',
-    name: 'Phantom',
-    brand: 'Rolls Royce',
+    name: 'Hundai Tucson N Line',
+    brand: 'Hundai',
     type: 'Luxury',
     pricePerDay: 1200,
     image: tucsonPic,
@@ -116,15 +116,15 @@ export const CARS: Car[] = [
   },
   {
     id: '5',
-    name: 'Taycan Turbo S',
-    brand: 'Porsche',
-    type: 'Electric',
+    name: 'golf 8r',
+    brand: 'Volkswagen',
+    type: 'Sport',
     pricePerDay: 400,
-    image: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&q=80&w=800',
+    image: golfPic,
     status: 'Maintenance',
     specs: {
       transmission: 'Automatic',
-      fuel: 'Electric',
+      fuel: 'diesel',
       seats: 4,
       acceleration: '2.6s 0-60'
     },
