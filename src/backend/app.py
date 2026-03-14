@@ -1,11 +1,15 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from models import db, User, Car, Reservation
+from dotenv import load_dotenv
 import urllib.parse
 import os
 import sys
 
 # --- 1. ENCODING & ENVIRONMENT FIXES ---
+# Load variables from the .env file
+load_dotenv()
+
 # This ensures Windows/French characters don't crash the terminal
 if sys.platform == "win32":
     os.environ['PGCLIENTENCODING'] = 'utf-8'
@@ -14,18 +18,23 @@ app = Flask(__name__)
 CORS(app)  # Allows React (Port 3000) to talk to Flask (Port 5000)
 
 # --- 2. DATABASE CONFIGURATION ---
-username = "postgres"
-password = "postgres" 
-database = "test26_db"
+# Pulling values from .env with fallbacks for safety
+username = os.getenv("DB_USERNAME", "postgres")
+password = os.getenv("DB_PASSWORD", "postgres")
+database = os.getenv("DB_NAME", "test26_db")
+db_host = os.getenv("DB_HOST", "localhost")
+db_port = os.getenv("DB_PORT", "5432")
 
+# We encode the password in case it contains special characters like @ or :
 encoded_password = urllib.parse.quote_plus(password)
 
-# Aggressive encoding fixes in the connection string
+# Constructing the URI dynamically so every teammate can use their own password
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f'postgresql://{username}:{encoded_password}@localhost:5432/{database}'
+    f'postgresql://{username}:{encoded_password}@{db_host}:{db_port}/{database}'
     '?client_encoding=utf8'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev-secret-key")
 
 db.init_app(app)
 
@@ -34,11 +43,10 @@ with app.app_context():
     try:
         db.create_all()
         print("--- LUXDRIVE BACKEND STATUS ---")
-        print("Database connected successfully.")
+        print(f"Database: {database} connected successfully on {db_host}.")
         print("Tables verified: Users, Cars, Reservations.")
         print("-------------------------------")
     except Exception as e:
-        # Using repr() to avoid decoding errors when printing errors
         print("Database connection error: " + repr(e))
 
 # --- 4. PUBLIC / SYSTEM ROUTES ---
@@ -85,7 +93,6 @@ def login():
     if not email or not password:
         return jsonify({"error": "Email and password are required"}), 400
 
-    # Look for the user in PostgreSQL
     user = User.query.filter_by(email=email).first()
 
     if user and user.password == password:
@@ -144,7 +151,7 @@ def update_reservation_status(res_id):
         if not booking:
             return jsonify({"error": "Reservation not found"}), 404
         
-        booking.status = data.get('status')  # Expected: 'Confirmed' or 'Cancelled'
+        booking.status = data.get('status')
         db.session.commit()
         return jsonify(booking.to_dict()), 200
     except Exception as e:
@@ -157,5 +164,4 @@ def resource_not_found(e):
     return jsonify({"error": "The requested URL was not found on the server."}), 404
 
 if __name__ == '__main__':
-    # Running on localhost (127.0.0.1)
     app.run(host='127.0.0.1', port=5000, debug=True)
