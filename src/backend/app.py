@@ -20,7 +20,7 @@ CORS(app)  # Allows React (Port 3000) to talk to Flask (Port 5000)
 # --- 2. DATABASE CONFIGURATION ---
 # Pulling values from .env with fallbacks for safety
 username = os.getenv("DB_USERNAME", "postgres")
-password = os.getenv("DB_PASSWORD", "postgres")
+password = os.getenv("DB_PASSWORD", "123456789")
 database = os.getenv("DB_NAME", "test26_db")
 db_host = os.getenv("DB_HOST", "localhost")
 db_port = os.getenv("DB_PORT", "5432")
