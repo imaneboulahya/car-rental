@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Car, User, LogIn, UserPlus, ChevronDown, Menu, X, LayoutDashboard } from 'lucide-react';
+import { Car, User, LogOut, CalendarCheck, ChevronDown, Menu, X, Settings } from 'lucide-react';
 
-export default function Navbar() {
+export default function ClientNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -10,6 +10,12 @@ export default function Navbar() {
   
   const location = useLocation();
   const navigate = useNavigate();
+
+  // MOCK USER: Replace this with your actual user state/context later
+  const client = {
+    name: "Ayoub",
+    email: "ayoub@example.com"
+  };
 
   // 1. Handle Scroll Glassmorphism
   useEffect(() => {
@@ -24,13 +30,8 @@ export default function Navbar() {
     localStorage.setItem('luxe-theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'midnight' ? 'showroom' : 'midnight'));
-  };
-
-  // 3. Smart Navigation Logic (UPDATED)
-  const handleNavClick = (e, href) => {
-    // Always close the mobile menu when a link is clicked
+  // 3. Smart Navigation Logic
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     setIsMobileMenuOpen(false); 
     
     if (href.startsWith('#')) {
@@ -44,6 +45,12 @@ export default function Navbar() {
         navigate(`/${href}`);
       }
     }
+  };
+
+  const handleLogout = () => {
+    // Add your logout logic here (clear localStorage, auth context, etc.)
+    console.log("Logging out...");
+    navigate('/');
   };
 
   const navLinks = [
@@ -105,6 +112,8 @@ export default function Navbar() {
 
           {/* DESKTOP ACTIONS */}
           <div className="hidden lg:flex items-center gap-6">
+            
+            {/* CLIENT ACCOUNT DROPDOWN */}
             <div 
               className="relative py-3"
               onMouseEnter={() => setIsHovered(true)}
@@ -113,8 +122,11 @@ export default function Navbar() {
               <button className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${
                 isHovered ? 'bg-blue-600 text-white border-blue-600' : 'border-[var(--border)] text-[var(--text-muted)]'
               }`}>
-                <User size={18} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Account</span>
+                {/* Show User's Initial */}
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${isHovered ? 'bg-white text-blue-600' : 'bg-blue-600/20 text-blue-500'}`}>
+                  {client.name.charAt(0)}
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest">{client.name}</span>
                 <ChevronDown size={14} className={`transition-transform duration-300 ${isHovered ? 'rotate-180' : ''}`} />
               </button>
 
@@ -122,18 +134,25 @@ export default function Navbar() {
                 isHovered ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
               }`}>
                 <div className="bg-[var(--bg-dropdown)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-2xl p-2 backdrop-blur-3xl">
-                  <Link to="/login" className="flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-blue-600/10 hover:text-blue-500 rounded-xl transition-all">
-                    <LogIn size={16} />
-                    <span className="font-bold text-[var(--text-main)]">Sign In</span>
+                  
+                  {/* Client Info Header inside dropdown */}
+                  <div className="px-4 py-3 mb-2 border-b border-[var(--border)]">
+                    <p className="text-xs font-bold text-[var(--text-main)]">{client.name}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] truncate">{client.email}</p>
+                  </div>
+
+                  <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-blue-600/10 hover:text-blue-500 rounded-xl transition-all">
+                    <Settings size={16} />
+                    <span className="font-bold text-[var(--text-main)]">My Profile</span>
                   </Link>
-                  <Link to="/signup" className="flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-blue-600/10 hover:text-blue-500 rounded-xl transition-all">
-                    <UserPlus size={16} />
-                    <span className="font-bold text-[var(--text-main)]">Register</span>
+                  <Link to="/reservations" className="flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-blue-600/10 hover:text-blue-500 rounded-xl transition-all">
+                    <CalendarCheck size={16} />
+                    <span className="font-bold text-[var(--text-main)]">My Bookings</span>
                   </Link>
-                  <Link to="/admin" className="flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-blue-600/10 hover:text-blue-500 rounded-xl transition-all">
-                    <LayoutDashboard size={16} />
-                    <span className="font-bold text-[var(--text-main)]">Admin Dashboard</span>
-                  </Link>
+                  <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all">
+                    <LogOut size={16} />
+                    <span className="font-bold">Sign Out</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -153,12 +172,25 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* MOBILE MENU (UPDATED) */}
+      {/* MOBILE MENU */}
       <div className={`fixed inset-0 z-[90] bg-[var(--bg-nav)] backdrop-blur-3xl transition-transform duration-700 lg:hidden flex flex-col justify-center px-10 overflow-y-auto ${
         isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <div className="flex flex-col gap-6 mt-16">
           
+          {/* Client Welcome Mobile */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 bg-blue-600/20 border border-blue-500/30 rounded-xl flex items-center justify-center text-blue-500 font-black text-xl">
+              {client.name.charAt(0)}
+            </div>
+            <div>
+              <p className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest">Welcome back,</p>
+              <p className="text-2xl font-black text-[var(--text-main)]">{client.name}</p>
+            </div>
+          </div>
+
+          <hr className="border-[var(--border)] mb-2" />
+
           {/* Mobile Navigation Links */}
           {navLinks.map((link) => {
             const isHash = link.href.startsWith('#');
@@ -185,20 +217,20 @@ export default function Navbar() {
 
           <hr className="border-[var(--border)] my-4" />
 
-          {/* Mobile Account Actions */}
+          {/* Mobile Client Actions */}
           <div className="flex flex-col gap-4">
-            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold text-[var(--text-muted)] hover:text-blue-500 transition-colors">
-              <LogIn size={20} /> Sign In
+            <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold text-[var(--text-muted)] hover:text-blue-500 transition-colors">
+              <Settings size={20} /> My Profile
             </Link>
-            <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold text-[var(--text-muted)] hover:text-blue-500 transition-colors">
-              <UserPlus size={20} /> Register
+            <Link to="/reservations" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold text-[var(--text-muted)] hover:text-blue-500 transition-colors">
+              <CalendarCheck size={20} /> My Bookings
             </Link>
-            <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold text-[var(--text-muted)] hover:text-blue-500 transition-colors">
-              <LayoutDashboard size={20} /> Admin Dashboard
-            </Link>
+            <button onClick={handleLogout} className="flex items-center gap-3 text-xl font-bold text-rose-500 hover:text-rose-400 transition-colors text-left">
+              <LogOut size={20} /> Sign Out
+            </button>
           </div>
 
-          {/* Mobile Theme & Book Buttons */}
+          {/* Mobile Book Button */}
           <div className="flex flex-col gap-4 mt-4 mb-10">
             <Link 
               to="/fleet"

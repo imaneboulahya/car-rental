@@ -9,7 +9,6 @@ import benzPic from '../../asset/benz.jpeg';
 import tucsonPic from '../../asset/tucson.jpeg';
 import rangePic from '../../asset/range.avif';
 
-// FIX: Updated data to accurately match the imported images
 const FLEET = [
   { id: 'vw-troc', name: 'Volkswagen T-Roc R-Line', year: '2023', price: '450dh', type: 'Compact SUV', engine: '2.0L TSI 4Motion', trans: '7-Speed DSG', seats: '5', image: trocPic },
   { id: 'mercedes-benz', name: 'Mercedes-Benz S-Class', year: '2023', price: '1,800dh', type: 'Luxury Sedan', engine: '3.0L I6 Turbo', trans: '9G-Tronic', seats: '5', image: benzPic },
@@ -20,7 +19,14 @@ const FLEET = [
 
 
 export default function Fleet() {
-  const [selectedCar, setSelectedCar] = useState<typeof FLEET[0] | null>(null);
+  const [selectedCar, setSelectedCar] = useState<any>(null);
+  
+  // Instantly read from localStorage. If it's empty, fallback to the FLEET above.
+  const [fleetData, setFleetData] = useState(() => {
+    const savedCars = localStorage.getItem('luxedrive_fleet');
+    return savedCars ? JSON.parse(savedCars) : FLEET;
+  });
+
   const gridRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
 
@@ -50,55 +56,64 @@ export default function Fleet() {
 
       {/* --- CARD GRID --- */}
       <div ref={gridRef} className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {FLEET.map((car) => (
-          <div 
-            key={car.id}
-            onClick={() => setSelectedCar(car)}
-            style={{ opacity: 0 }} 
-            className="reveal group bg-[#0f172a] border border-white/10 rounded-2xl overflow-hidden hover:border-[#00d2ff]/50 transition-all duration-300 cursor-pointer flex flex-col shadow-lg hover:-translate-y-1"
-          >
-            {/* Image Section */}
-            <div className="relative h-56 overflow-hidden bg-slate-800">
-              <img src={car.image} alt={car.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
-            </div>
+        {fleetData.map((car: any) => {
+          // SMART FALLBACKS: Handle data whether it comes from FLEET or admin CARS
+          const displayYear = car.year || '2024';
+          const displayEngine = car.engine || car.specs?.fuel || 'Hybrid/Petrol';
+          const displayTrans = car.trans || car.specs?.transmission || 'Auto';
+          const displaySeats = car.seats || car.specs?.seats || '4';
+          const displayPrice = car.price || `${car.pricePerDay}dh`;
 
-            {/* Technical Specs Content */}
-            <div className="p-6 flex-1 flex flex-col z-10 -mt-2">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="text-xl font-bold text-white group-hover:text-[#00d2ff] transition-colors">{car.name}</h3>
-                  <p className="text-xs text-slate-400 uppercase tracking-widest mt-1 font-semibold">{car.type} • Model {car.year}</p>
-                </div>
-                <div className="bg-white/5 p-2 rounded-lg border border-white/10 group-hover:border-[#00d2ff]/30 transition-colors">
-                   <Shield size={16} className="text-[#00d2ff]" />
-                </div>
+          return (
+            <div 
+              key={car.id}
+              onClick={() => setSelectedCar({ ...car, displayPrice })} // Pass displayPrice into modal
+              style={{ opacity: 0 }} 
+              className="reveal group bg-[#0f172a] border border-white/10 rounded-2xl overflow-hidden hover:border-[#00d2ff]/50 transition-all duration-300 cursor-pointer flex flex-col shadow-lg hover:-translate-y-1"
+            >
+              {/* Image Section */}
+              <div className="relative h-56 overflow-hidden bg-slate-800">
+                <img src={car.image} alt={car.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
               </div>
 
-              {/* Specs Grid */}
-              <div className="grid grid-cols-2 gap-x-4 gap-y-4 py-4 border-t border-white/10">
-                <SpecRow label="Powertrain" value={car.engine} />
-                <SpecRow label="Transmission" value={car.trans} />
-                <SpecRow label="Body Type" value={car.type} />
-                <SpecRow label="Seating" value={`${car.seats} Adults`} />
-              </div>
-
-              {/* Price & Action */}
-              <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Starting at</p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-white">{car.price}</span>
-                    <span className="text-slate-500 text-xs">/day</span>
+              {/* Technical Specs Content */}
+              <div className="p-6 flex-1 flex flex-col z-10 -mt-2">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-white group-hover:text-[#00d2ff] transition-colors">{car.name}</h3>
+                    <p className="text-xs text-slate-400 uppercase tracking-widest mt-1 font-semibold">{car.type} • Model {displayYear}</p>
+                  </div>
+                  <div className="bg-white/5 p-2 rounded-lg border border-white/10 group-hover:border-[#00d2ff]/30 transition-colors">
+                     <Shield size={16} className="text-[#00d2ff]" />
                   </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-[#00d2ff] flex items-center justify-center text-[#020617] transition-transform duration-300 group-hover:scale-110 shadow-[0_0_15px_rgba(0,210,255,0.4)]">
-                  <ArrowRight size={20} strokeWidth={3} />
+
+                {/* Specs Grid */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-4 py-4 border-t border-white/10">
+                  <SpecRow label="Powertrain" value={displayEngine} />
+                  <SpecRow label="Transmission" value={displayTrans} />
+                  <SpecRow label="Body Type" value={car.type} />
+                  <SpecRow label="Seating" value={`${displaySeats} Adults`} />
+                </div>
+
+                {/* Price & Action */}
+                <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Starting at</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-bold text-white">{displayPrice}</span>
+                      <span className="text-slate-500 text-xs">/day</span>
+                    </div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-[#00d2ff] flex items-center justify-center text-[#020617] transition-transform duration-300 group-hover:scale-110 shadow-[0_0_15px_rgba(0,210,255,0.4)]">
+                    <ArrowRight size={20} strokeWidth={3} />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* --- MODAL --- */}
@@ -146,8 +161,8 @@ function BookingModal({ car, onClose }: { car: any, onClose: () => void }) {
             </div>
           </div>
 
-          <button className="w-full py-4 bg-[#00d2ff] text-[#020617] rounded-xl font-black text-sm uppercase tracking-widest hover:brightness-110 hover:scale-[1.02] transition-transform duration-200">
-            Reserve This Vehicle
+          <button className="w-full py-4 bg-[#00d2ff] text-[#020617] rounded-xl font-black text-sm uppercase tracking-widest hover:brightness-110 hover:scale-[1.02] transition-transform duration-200 flex justify-center gap-2">
+            Reserve For {car.displayPrice}
           </button>
           <p className="text-center text-slate-500 text-[11px] mt-4 italic">No payment required until collection.</p>
         </div>

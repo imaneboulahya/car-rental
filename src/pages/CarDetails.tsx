@@ -114,13 +114,8 @@ export default function CarDetails() {
 
             <div className="grid grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-2xl overflow-hidden border border-white/10 hover:border-brand-accent/50 transition-colors cursor-pointer">
-                  <img 
-                    src={`${car.image}&sig=${i}`} 
-                    alt={`${car.name} view ${i}`} 
-                    className="w-full h-24 object-cover opacity-60 hover:opacity-100 transition-opacity"
-                    referrerPolicy="no-referrer"
-                  />
+                <div key={i} className="rounded-xl overflow-hidden bg-slate-800 border border-white/10">
+                  
                 </div>
               ))}
             </div>
@@ -176,7 +171,7 @@ export default function CarDetails() {
             </div>
 
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-display font-bold text-brand-accent">${car.pricePerDay}</span>
+              <span className="text-4xl font-display font-bold text-brand-accent">{car.pricePerDay}dh</span>
               <span className="text-slate-500 uppercase text-sm tracking-widest">/ Per Day</span>
             </div>
 
@@ -224,10 +219,10 @@ export default function CarDetails() {
                   </div>
                 </div>
               </div>
-
-              <button className="w-full bg-brand-accent hover:bg-brand-accent/90 text-brand-deep font-bold py-5 rounded-2xl flex items-center justify-center gap-3 transition-all blue-glow-hover text-lg">
+<Link to={`/fleet`} className="w-full bg-brand-accent hover:bg-brand-accent/90 text-brand-deep font-bold py-5 rounded-2xl flex items-center justify-center gap-3 transition-all blue-glow-hover text-lg">
                 Book This {car.name}
-              </button>
+              </Link>
+              
               
               <p className="text-center text-xs text-slate-500">
                 By clicking "Book Now", you agree to our terms of service and rental policy.

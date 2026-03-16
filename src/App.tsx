@@ -41,7 +41,7 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
 export default function App() {
   return (
-    <ThemeProvider>
+    
       <Router>
         <ScrollToTop />
         
@@ -67,6 +67,6 @@ export default function App() {
           </Routes>
         </LayoutWrapper>
       </Router>
-    </ThemeProvider>
+    
   );
 }
