@@ -10,13 +10,15 @@ import rangePic from '../../asset/range.avif';
 import trocPic from '../../asset/troc.jpeg';
 import tucsonPic from '../../asset/tucson.jpeg';
 import golfPic from '../../asset/golf.jpg';
+import clioPic from '../../asset/clio.jpg';
 
 const CATEGORIES = [
   { id: 'performance', title: 'The Purist', subtitle: 'Unfiltered, track-ready adrenaline.', image: benzPic },
   { id: 'luxury', title: 'The Executive', subtitle: 'Uncompromising comfort and prestige.', image: rangePic },
   { id: 'exotic', title: 'The Maverick', subtitle: 'Exotic aesthetics and raw, untamed power.', image: trocPic },
   { id: 'suv', title: 'The Commander', subtitle: 'Absolute dominance on any terrain.', image: tucsonPic },
-  { id: 'electric', title: 'The Visionary', subtitle: 'The silent, blistering future of driving.', image: golfPic }
+  { id: 'electric', title: 'The Visionary', subtitle: 'The silent, blistering future of driving.', image: golfPic },
+  { id: 'sport', title: 'The Enthusiast', subtitle: 'The perfect blend of daily usability and spirited performance.', image: clioPic }
 ];
 
 export default function FinalCTA() {

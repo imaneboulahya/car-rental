@@ -111,9 +111,9 @@ export default function About() {
           <div className="mobile-fade w-full lg:w-[45vw] shrink-0 flex flex-col justify-center">
             <div className="w-16 h-1 bg-[#00d2ff] rounded-full mb-8 shadow-[0_0_15px_rgba(0,210,255,0.5)]" />
             
-            <h2 className="text-5xl md:text-6xl lg:text-[6rem] font-display font-black text-white mb-6 leading-[1.05] tracking-tight">
+            <h2 className="text-3xl md:text-6xl lg:text-[4rem] font-display font-black text-white mb-6 leading-[1.05] tracking-tight pr-4">
               Redefining the <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d2ff] to-blue-600 italic pr-4">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d2ff] to-blue-600 italic pr-6">
                 Luxury Rental
               </span> <br className="hidden lg:block" /> Experience.
             </h2>

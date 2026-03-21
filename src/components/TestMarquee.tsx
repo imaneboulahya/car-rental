@@ -6,7 +6,7 @@ import { CARS } from '../types';
 
 // 1. Ultra-Premium Cinematic Card
 function MarqueeCard({ car }: { car: any }) {
-  // Gracefully handle data whether it's from default CARS array or added via Admin
+  // Gracefully handle data
   const displaySeats = car.specs?.seats || car.seats || '4';
   const displayFuel = car.specs?.fuel || car.engine || 'Petrol';
   const displayAccel = car.specs?.acceleration?.split(' ')[0] || car.trans || 'Auto';
@@ -60,7 +60,7 @@ function MarqueeCard({ car }: { car: any }) {
           </div>
         </div>
 
-        {/* Action Button - FIX: Changed /fleet back to /car/${car.id} */}
+        {/* Action Button */}
         <Link 
           to={`/car/${car.id}`} 
           className="w-full py-2.5 md:py-3 rounded-xl backdrop-blur-md bg-white/10 border border-white/20 text-white text-sm md:text-base font-semibold flex items-center justify-center gap-2 md:gap-4 hover:bg-brand-accent hover:text-brand-deep hover:border-brand-accent transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100 transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 md:delay-100"
@@ -80,12 +80,6 @@ export default function TestMarquee() {
   const rowRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Instantly read from localStorage. If it's empty, fallback to CARS from types.
-  const [fleetCars, setFleetCars] = useState<any[]>(() => {
-    const savedCars = localStorage.getItem('luxedrive_fleet');
-    return savedCars ? JSON.parse(savedCars) : CARS;
-  });
-
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize(); 
@@ -93,7 +87,8 @@ export default function TestMarquee() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const displayCars = isMobile ? fleetCars : [...fleetCars, ...fleetCars, ...fleetCars]; 
+  // Use the static CARS array directly, ignoring localStorage completely
+  const displayCars = isMobile ? CARS : [...CARS, ...CARS, ...CARS]; 
 
   useEffect(() => {
     let ctx = gsap.context(() => {

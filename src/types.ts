@@ -3,6 +3,7 @@ import trocPic from '../asset/troc.jpeg';
 import benzPic from '../asset/benz.jpeg';
 import tucsonPic from '../asset/tucson.jpeg';
 import golfPic from '../asset/golf.jpg';
+import clioPic from '../asset/clio.jpg';
 // --- INTERFACES ---
 
 export interface Car {
