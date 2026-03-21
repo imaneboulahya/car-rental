@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import urllib.parse
 import os
 import sys
+from flask_mail import Mail, Message
 
 # --- 1. ENCODING & ENVIRONMENT FIXES ---
 # Load variables from the .env file
@@ -16,6 +17,15 @@ if sys.platform == "win32":
 
 app = Flask(__name__)
 CORS(app)  # Allows React (Port 3000) to talk to Flask (Port 5000)
+# EMAIL CONFIG
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'ocationvoiture@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ffes ncsx ybuv thiw'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+
+mail = Mail(app)
 
 # --- 2. DATABASE CONFIGURATION ---
 # Pulling values from .env with fallbacks for safety
@@ -163,5 +173,44 @@ def update_reservation_status(res_id):
 def resource_not_found(e):
     return jsonify({"error": "The requested URL was not found on the server."}), 404
 
+# --- 9. CONTACT FORM EMAIL ---
+@app.route('/api/contact/send', methods=['POST'])
+def send_contact_email():
+    data = request.json
+
+    full_name = data.get('fullName')
+    email = data.get('emailAddress')
+    subject = data.get('subject')
+    message = data.get('message')
+
+    if not full_name or not email or not message:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    try:
+        msg = Message(
+            subject=f"🚗 Nouvelle demande - {subject}",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[app.config['MAIL_USERNAME']]
+        )
+
+        msg.body = f"""
+Nom: {full_name}
+Email: {email}
+Sujet: {subject}
+
+Message:
+{message}
+"""
+
+        mail.send(msg)
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        print("EMAIL ERROR:", e)
+        return jsonify({"error": "Email failed"}), 500
+
+
+# ✅ TOUJOURS À LA FIN
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=8080, debug=True)
