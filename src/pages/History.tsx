@@ -1,23 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, Calendar, ChevronRight, Car, MapPin } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Car, MapPin, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function History() {
   const [bookings, setBookings] = useState([]);
 
-  useEffect(() => {
-    // 1. Get current user
+  // 1. Load and Filter Bookings
+  const loadBookings = () => {
     const user = JSON.parse(localStorage.getItem('user') || 'null');
-    
-    // 2. Get all bookings
     const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
 
-    // 3. FILTER BY USER EMAIL
     if (user && user.email) {
       const myBookings = allBookings.filter((book: any) => book.userEmail === user.email);
       setBookings(myBookings);
     }
+  };
+
+  useEffect(() => {
+    loadBookings();
   }, []);
+
+  // 2. Cancellation Logic
+  const handleCancel = (bookingId: number, carName: string) => {
+    const confirmCancel = window.confirm(`Are you sure you want to cancel your reservation for the ${carName}?`);
+    
+    if (confirmCancel) {
+      // Get all bookings from global storage
+      const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
+      
+      // Filter out the one we want to delete
+      const updatedAllBookings = allBookings.filter((book: any) => book.id !== bookingId);
+      
+      // Save the global list back to localStorage
+      localStorage.setItem('luxedrive_bookings', JSON.stringify(updatedAllBookings));
+      
+      // Refresh the local state to update the UI
+      loadBookings();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#020617] pt-32 pb-20 px-6 text-white font-sans">
@@ -42,14 +62,18 @@ export default function History() {
                 className="group bg-[#0f172a] border border-white/5 rounded-[2.5rem] p-4 md:p-6 flex flex-col md:flex-row items-center gap-8 hover:border-[#00d2ff]/30 transition-all duration-500 shadow-2xl relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-[60px] -mr-16 -mt-16 group-hover:bg-blue-600/10 transition-colors" />
+                
                 <div className="w-full md:w-56 h-36 bg-slate-800 rounded-[1.5rem] overflow-hidden relative">
                   <img src={book.image} alt={book.carName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 to-transparent" />
                 </div>
+
                 <div className="flex-1 w-full text-center md:text-left">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                      <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-[#00d2ff] transition-colors">{book.carName}</h3>
+                      <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-[#00d2ff] transition-colors">
+                        {book.carName}
+                      </h3>
                       <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 mt-2 text-slate-400">
                         <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
                           <Calendar size={14} className="text-blue-500" /> {book.dateRange}
@@ -59,6 +83,7 @@ export default function History() {
                         </span>
                       </div>
                     </div>
+
                     <div className="flex flex-col items-center md:items-end gap-2">
                       <div className="px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">{book.status}</span>
@@ -67,11 +92,17 @@ export default function History() {
                         <span className="text-2xl font-black text-white">{book.price}</span>
                         <span className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Total</span>
                       </div>
+                      
+                      {/* --- CANCEL BUTTON --- */}
+                      <button 
+                        onClick={() => handleCancel(book.id, book.carName)}
+                        className="mt-2 flex items-center gap-2 text-rose-500 hover:text-rose-400 transition-colors text-[10px] font-bold uppercase tracking-widest group/btn"
+                      >
+                        <Trash2 size={14} className="group-hover/btn:animate-pulse" />
+                        Cancel Booking
+                      </button>
                     </div>
                   </div>
-                </div>
-                <div className="hidden lg:flex w-12 h-12 rounded-full border border-white/10 items-center justify-center group-hover:bg-[#00d2ff] group-hover:text-black group-hover:border-transparent transition-all duration-300">
-                  <ChevronRight size={20} />
                 </div>
               </div>
             ))}
