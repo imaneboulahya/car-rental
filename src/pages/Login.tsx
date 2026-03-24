@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 
-export default function Login() {
+// Added setUser prop
+export default function Login({ setUser }: { setUser: (user: any) => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
+      const response = await fetch('http://127.0.0.1:8080/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -20,16 +21,16 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store user in local storage
+        // 1. Save to LocalStorage for persistence
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // 2. Update App state to swap Navbar to NavClients
+        setUser(data.user);
 
-        // CRITICAL: Check for Admin Credentials
         const cleanEmail = email.trim().toLowerCase();
         if (cleanEmail === "admin@example.com" && password === "admin1234") {
-          console.log("Admin detected. Navigating to /admin...");
           navigate('/admin'); 
         } else {
-          console.log("Regular user detected. Navigating to home...");
           navigate('/');
         }
       } else {
@@ -50,7 +51,7 @@ export default function Login() {
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
               <input 
-                type="text" 
+                type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#1e293b] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500"

@@ -31,4 +31,5 @@ CREATE TABLE IF NOT EXISTS reservations (
 INSERT INTO users (username, email, password)
 VALUES ('admin', 'admin@example.com', 'admin1234');
 
+
     

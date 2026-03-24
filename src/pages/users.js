@@ -5,7 +5,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     // Fetch users from your Flask API
-    fetch('http://127.0.0.1:5000/users')
+    fetch('http://127.0.0.1:8080/users')
       .then(res => res.json())
       .then(data => setUsers(data))
       .catch(err => console.error("Error fetching users:", err));

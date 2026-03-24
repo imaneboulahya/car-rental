@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import { X, Calendar, Clock, ArrowRight, Shield, Zap } from 'lucide-react';
+import { X, ArrowRight, Shield, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 // Assets
@@ -19,19 +20,17 @@ const FLEET = [
 
 export default function Fleet() {
   const [selectedCar, setSelectedCar] = useState<any>(null);
+  const navigate = useNavigate();
   
-  // Instantly read from localStorage. If it's empty, fallback to the FLEET above.
-  const [fleetData, setFleetData] = useState(() => {
+  const [fleetData] = useState(() => {
     const savedCars = localStorage.getItem('luxedrive_fleet');
     return savedCars ? JSON.parse(savedCars) : FLEET;
   });
 
   const gridRef = useRef<HTMLDivElement>(null);
-  const { t } = useTranslation();
 
   useEffect(() => {
     let ctx = gsap.context(() => {
-      // Super snappy animation settings
       gsap.fromTo(".reveal", 
         { opacity: 0, y: 20 }, 
         { opacity: 1, y: 0, stagger: 0.05, duration: 0.4, ease: "power2.out" }
@@ -42,9 +41,7 @@ export default function Fleet() {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white pt-32 pb-20 px-6 font-sans">
-      
-      {/* --- HEADER --- */}
-      <div className="max-w-7xl mx-auto mb-16 text-center reveal text-white" style={{ opacity: 0 }}>
+      <div className="max-w-7xl mx-auto mb-16 text-center reveal" style={{ opacity: 0 }}>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-white">
           The <span className="text-[#00d2ff] italic">Elite</span> Collection
         </h1>
@@ -53,50 +50,36 @@ export default function Fleet() {
         </p>
       </div>
 
-      {/* --- CARD GRID --- */}
       <div ref={gridRef} className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {fleetData.map((car: any) => {
-          // SMART FALLBACKS: Handle data whether it comes from FLEET or admin CARS
-          const displayYear = car.year || '2024';
-          const displayEngine = car.engine || car.specs?.fuel || 'Hybrid/Petrol';
-          const displayTrans = car.trans || car.specs?.transmission || 'Auto';
-          const displaySeats = car.seats || car.specs?.seats || '4';
           const displayPrice = car.price || `${car.pricePerDay}dh`;
-
           return (
             <div 
               key={car.id}
-              onClick={() => setSelectedCar({ ...car, displayPrice })} // Pass displayPrice into modal
+              onClick={() => setSelectedCar({ ...car, displayPrice })}
               style={{ opacity: 0 }} 
               className="reveal group bg-[#0f172a] border border-white/10 rounded-2xl overflow-hidden hover:border-[#00d2ff]/50 transition-all duration-300 cursor-pointer flex flex-col shadow-lg hover:-translate-y-1"
             >
-              {/* Image Section */}
               <div className="relative h-56 overflow-hidden bg-slate-800">
                 <img src={car.image} alt={car.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
               </div>
-
-              {/* Technical Specs Content */}
               <div className="p-6 flex-1 flex flex-col z-10 -mt-2">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-xl font-bold text-white group-hover:text-[#00d2ff] transition-colors">{car.name}</h3>
-                    <p className="text-xs text-slate-400 uppercase tracking-widest mt-1 font-semibold">{car.type} • Model {displayYear}</p>
+                    <p className="text-xs text-slate-400 uppercase tracking-widest mt-1 font-semibold">{car.type} • {car.year}</p>
                   </div>
-                  <div className="bg-white/5 p-2 rounded-lg border border-white/10 group-hover:border-[#00d2ff]/30 transition-colors">
+                  <div className="bg-white/5 p-2 rounded-lg border border-white/10">
                      <Shield size={16} className="text-[#00d2ff]" />
                   </div>
                 </div>
-
-                {/* Specs Grid */}
                 <div className="grid grid-cols-2 gap-x-4 gap-y-4 py-4 border-t border-white/10">
-                  <SpecRow label="Powertrain" value={displayEngine} />
-                  <SpecRow label="Transmission" value={displayTrans} />
+                  <SpecRow label="Powertrain" value={car.engine} />
+                  <SpecRow label="Transmission" value={car.trans} />
                   <SpecRow label="Body Type" value={car.type} />
-                  <SpecRow label="Seating" value={`${displaySeats} Adults`} />
+                  <SpecRow label="Seating" value={`${car.seats} Adults`} />
                 </div>
-
-                {/* Price & Action */}
                 <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
                   <div>
                     <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Starting at</p>
@@ -114,14 +97,11 @@ export default function Fleet() {
           )
         })}
       </div>
-
-      {/* --- MODAL --- */}
       {selectedCar && <BookingModal car={selectedCar} onClose={() => setSelectedCar(null)} />}
     </div>
   );
 }
 
-// Sub-component for Spec Rows
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
@@ -131,13 +111,48 @@ function SpecRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Modal component
 function BookingModal({ car, onClose }: { car: any, onClose: () => void }) {
+  const navigate = useNavigate();
+  const [dates, setDates] = useState({ pickUp: '', dropOff: '' });
+
+  const handleReservation = () => {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (!user) {
+      alert("Please login to complete your reservation.");
+      navigate('/login');
+      return;
+    }
+
+    if (!dates.pickUp || !dates.dropOff) {
+      alert("Please select your dates.");
+      return;
+    }
+
+    // CREATE BOOKING TAGGED TO CURRENT USER EMAIL
+    const newBooking = {
+      id: Date.now(),
+      userEmail: user.email, // THIS LINKS IT TO THE SPECIFIC USER
+      carName: car.name,
+      image: car.image,
+      dateRange: `${dates.pickUp} to ${dates.dropOff}`,
+      price: car.displayPrice,
+      status: 'Confirmed'
+    };
+
+    const existingHistory = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
+    localStorage.setItem('luxedrive_bookings', JSON.stringify([newBooking, ...existingHistory]));
+
+    alert(`Success! Your ${car.name} is reserved.`);
+    onClose();
+    navigate('/history');
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="bg-[#0f172a] border border-white/10 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in fade-in zoom-in duration-200">
         <div className="md:w-1/2 relative h-64 md:h-auto">
-          <img src={car.image} className="w-full h-full object-cover" alt="" />
+          <img src={car.image} className="w-full h-full object-cover" alt={car.name} />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0f172a]" />
           <button onClick={onClose} className="absolute top-4 left-4 p-2 bg-black/50 text-white rounded-full hover:bg-[#00d2ff] hover:text-black transition-all">
             <X size={20} />
@@ -148,19 +163,28 @@ function BookingModal({ car, onClose }: { car: any, onClose: () => void }) {
           <p className="text-[#00d2ff] text-sm font-bold uppercase tracking-widest mb-8 flex items-center gap-2">
             <Zap size={14} /> Full Insurance Coverage Included
           </p>
-          
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
               <label className="block text-[10px] uppercase font-bold text-slate-400 mb-2">Pick-Up</label>
-              <input type="date" className="bg-transparent text-white text-sm outline-none w-full [color-scheme:dark]" />
+              <input 
+                type="date" 
+                onChange={(e) => setDates({...dates, pickUp: e.target.value})}
+                className="bg-transparent text-white text-sm outline-none w-full [color-scheme:dark]" 
+              />
             </div>
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
               <label className="block text-[10px] uppercase font-bold text-slate-400 mb-2">Drop-Off</label>
-              <input type="date" className="bg-transparent text-white text-sm outline-none w-full [color-scheme:dark]" />
+              <input 
+                type="date" 
+                onChange={(e) => setDates({...dates, dropOff: e.target.value})}
+                className="bg-transparent text-white text-sm outline-none w-full [color-scheme:dark]" 
+              />
             </div>
           </div>
-
-          <button className="w-full py-4 bg-[#00d2ff] text-[#020617] rounded-xl font-black text-sm uppercase tracking-widest hover:brightness-110 hover:scale-[1.02] transition-transform duration-200 flex justify-center gap-2">
+          <button 
+            onClick={handleReservation}
+            className="w-full py-4 bg-[#00d2ff] text-[#020617] rounded-xl font-black text-sm uppercase tracking-widest hover:brightness-110 hover:scale-[1.02] transition-transform duration-200 flex justify-center gap-2"
+          >
             Reserve For {car.displayPrice}
           </button>
           <p className="text-center text-slate-500 text-[11px] mt-4 italic">No payment required until collection.</p>
