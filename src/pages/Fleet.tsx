@@ -17,7 +17,6 @@ const FLEET = [
   { id: 'porsche', name: 'Porsche 911 Carrera S', year: '2023', price: '1,200dh', type: 'Sports Car', engine: '3.0L Twin-Turbo Flat-6', trans: '7-Speed PDK', seats: '2', image: rangePic }
 ];
 
-
 export default function Fleet() {
   const [selectedCar, setSelectedCar] = useState<any>(null);
   
