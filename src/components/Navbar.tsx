@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, LogIn, UserPlus, ChevronDown, Menu, X, LayoutDashboard } from 'lucide-react';
-import logoPic from '../asset/logo.png'; // Ensure this path is correct based on your folder structure
+import logoPic from '../../asset/logo.jpeg'; // Ensure this path is correct based on your folder structure
 // If your logo is in src/assets, uncomment the line below:
 // import logoImg from '../asset/logo.png';
 
@@ -66,7 +66,7 @@ export default function Navbar() {
           <Link to="/" className="flex items-center z-[110]" onClick={() => setIsMobileMenuOpen(false)}>
             <div className="h-10 md:h-12 w-auto flex items-center justify-center overflow-hidden transition-all duration-500">
               <img 
-                src="../asset/logo.png" // Ensure this path is correct based on your folder structure
+                src={logoPic}
                 alt="LuxeDrive Logo" 
                 className="h-full w-auto object-contain"
               />

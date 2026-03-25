@@ -4,6 +4,7 @@ import benzPic from '../asset/benz.jpeg';
 import tucsonPic from '../asset/tucson.jpeg';
 import golfPic from '../asset/golf.jpg';
 import clioPic from '../asset/clio.jpg';
+import logoPic from '../asset/logo.jpeg'; // Ensure this path is correct based on your folder structure
 // --- INTERFACES ---
 
 export interface Car {
