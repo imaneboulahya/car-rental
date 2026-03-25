@@ -1,8 +1,9 @@
 import React, { useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'; // ✅ AJOUT
-import { Car, Instagram, Twitter, Facebook, Linkedin, ArrowUp, ChevronRight, Send } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Linkedin, ArrowUp, ChevronRight, Send } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import logoPic from '../../asset/logo.jpeg';
 
 export default function Footer() {
   const footerRef = useRef<HTMLElement>(null);
@@ -61,13 +62,12 @@ export default function Footer() {
         <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">
           
           <div className="lg:col-span-4 flex flex-col items-start pr-8">
-            <div className="flex items-center gap-3 mb-8 group cursor-pointer" onClick={scrollToTop}>
-              <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(var(--brand-accent-rgb),0.5)] group-hover:scale-105 transition-transform duration-300">
-                <Car className="text-[#020617]" size={24} />
-              </div>
-              <span className="text-2xl font-display font-black tracking-widest text-white">
-                LUXE<span className="text-brand-accent">DRIVE</span>
-              </span>
+            <div className="flex items-center gap-3 mb-8 group cursor-pointer h-12" onClick={scrollToTop}>
+              <img 
+                src={logoPic} 
+                alt="LuxeDrive Logo" 
+                className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+              />
             </div>
             
             <p className="text-slate-400 leading-relaxed font-light mb-8 max-w-sm">
