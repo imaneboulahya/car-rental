@@ -71,31 +71,17 @@ export default function ClientNavbar() {
           }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-<<<<<<< HEAD
           
-         {/* LOGO */}
-                   <Link to="/" className="flex items-center z-[110]" onClick={() => setIsMobileMenuOpen(false)}>
-                     <div className="h-10 md:h-12 w-auto flex items-center justify-center overflow-hidden transition-all duration-500">
-                       <img 
-                         src={logoPic}
-                         alt="LuxeDrive Logo" 
-                         className="h-full w-auto object-contain"
-                       />
-                     </div>
-                   </Link>
-=======
-
-          {/* LOGO */}
+          {/* LOGO SECTION - CONFLICT FIXED HERE */}
           <Link to="/" className="flex items-center z-[110]" onClick={() => setIsMobileMenuOpen(false)}>
             <div className="h-10 md:h-12 w-auto flex items-center justify-center overflow-hidden transition-all duration-500">
-              <img
-                src="../../asset/logo.jpeg"
-                alt="LuxeDrive Logo"
+              <img 
+                src={logoPic}
+                alt="LuxeDrive Logo" 
                 className="h-full w-auto object-contain"
               />
             </div>
           </Link>
->>>>>>> 8394817ae4614874b40170fba338a639cdbab2c7
 
           {/* DESKTOP NAVIGATION */}
           <div className="hidden lg:flex items-center gap-10">
@@ -144,7 +130,6 @@ export default function ClientNavbar() {
                     <span className="font-bold text-[var(--text-main)]">My Profile</span>
                   </Link>
 
-                  {/* RESERVATION HISTORY TOGGLE */}
                   <Link to="/history" className="flex items-center gap-3 px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-blue-600/10 hover:text-blue-500 rounded-xl transition-all">
                     <Clock size={16} />
                     <span className="font-bold text-[var(--text-main)]">My History</span>
