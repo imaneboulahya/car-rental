@@ -16,6 +16,7 @@ import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import History from './pages/History';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 /**
  * ScrollToTop Component
@@ -100,8 +101,7 @@ export default function App() {
           
           {/* Legal Pages */}
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          {/* Temporary route for Terms so the Footer link doesn't break */}
-          <Route path="/terms" element={<PrivacyPolicy />} /> 
+          <Route path="/terms" element={<TermsOfService />} />
           
           {/* User Specific */}
           <Route path="/profile" element={<Profile />} />
