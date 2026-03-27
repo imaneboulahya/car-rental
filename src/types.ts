@@ -1,4 +1,5 @@
 import rangePic from '../asset/range.avif';
+import seatLeonPic from '../asset/seat leon.png';
 import trocPic from '../asset/troc.jpeg';
 import benzPic from '../asset/benz.jpeg';
 import tucsonPic from '../asset/tucson.jpeg';
@@ -56,7 +57,7 @@ export const CARS: Car[] = [
     name: 'Range Rover SV',
     brand: 'Land Rover',
     type: 'Sport',
-    pricePerDay: 250,
+    pricePerDay: 1000,
     image: rangePic,
     status: 'Available',
     specs: {
@@ -72,7 +73,7 @@ export const CARS: Car[] = [
     name: 'Volkswagen T-Roc',
     brand: 'Volkswagen',
     type: 'Sport',
-    pricePerDay: 450,
+    pricePerDay: 600,
     image: trocPic,
     status: 'Rented',
     nextAvailableDate: '2026-03-15',
@@ -89,7 +90,7 @@ export const CARS: Car[] = [
     name: 'G-Wagon G63',
     brand: 'Mercedes',
     type: 'SUV',
-    pricePerDay: 600,
+    pricePerDay: 800,
     image: benzPic,
     status: 'Available',
     specs: {
@@ -105,7 +106,7 @@ export const CARS: Car[] = [
     name: 'Hundai Tucson N Line',
     brand: 'Hundai',
     type: 'Luxury',
-    pricePerDay: 1200,
+    pricePerDay: 600,
     image: tucsonPic,
     status: 'Available',
     specs: {
@@ -121,7 +122,7 @@ export const CARS: Car[] = [
     name: 'golf 8r',
     brand: 'Volkswagen',
     type: 'Sport',
-    pricePerDay: 400,
+    pricePerDay: 900,
     image: golfPic,
     status: 'Maintenance',
     specs: {
@@ -134,18 +135,18 @@ export const CARS: Car[] = [
   },
   {
     id: '6',
-    name: 'Range Rover SV',
-    brand: 'Land Rover',
-    type: 'SUV',
-    pricePerDay: 550,
-    image: 'https://images.unsplash.com/photo-1606611013016-969c19ba27bb?auto=format&fit=crop&q=80&w=800',
+    name: 'Seat Leon',
+    brand: 'SEAT',
+    type: 'Sport',
+    pricePerDay: 400,
+    image: seatLeonPic,
     status: 'Available',
     specs: {
       transmission: 'Automatic',
-      fuel: 'Hybrid',
+      fuel: 'Gasoline',
       seats: 5,
-      acceleration: '5.5s 0-60'
+      acceleration: '7.5s 0-60'
     },
-    features: ['Executive Seating', 'Terrain Response 2', 'Meridian Signature']
+    features: ['Digital Cockpit', 'Full LED Headlights', 'Lane Assist']
   }
 ];

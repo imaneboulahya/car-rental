@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom'; // ✅ Consolidated import
-import { Instagram, Twitter, Facebook, Linkedin, ArrowUp, ChevronRight, Send } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Linkedin, ArrowUp, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import logoPic from '../../asset/logo.jpeg';
@@ -59,9 +59,9 @@ export default function Footer() {
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20">
           
-          <div className="lg:col-span-4 flex flex-col items-start pr-8">
+          <div className="md:col-span-1 flex flex-col items-start pr-8">
             <div className="flex items-center gap-3 mb-8 group cursor-pointer h-12" onClick={scrollToTop}>
               <img 
                 src={logoPic} 
@@ -87,7 +87,7 @@ export default function Footer() {
             </div>
           </div>
           
-          <div className="lg:col-span-2">
+          <div className="md:col-span-1">
             <h4 className="text-white font-display font-bold mb-6 tracking-wide">Quick Links</h4>
             <ul className="space-y-4">
               {[
@@ -107,7 +107,7 @@ export default function Footer() {
             </ul>
           </div>
           
-          <div className="lg:col-span-2">
+          <div className="md:col-span-1">
             <h4 className="text-white font-display font-bold mb-6 tracking-wide">Categories</h4>
             <ul className="space-y-4">
               {['The Purist', 'The Executive', 'The Maverick', 'The Commander', 'The Visionary'].map((item, i) => (
@@ -121,33 +121,8 @@ export default function Footer() {
             </ul>
           </div>
           
-          <div className="lg:col-span-4">
-            <h4 className="text-white font-display font-bold mb-6 tracking-wide">The Inner Circle</h4>
-            <p className="text-slate-400 mb-6 text-sm font-light leading-relaxed">
-              Subscribe to receive exclusive access to off-market additions and private driving events.
-            </p>
-            
-            <form className="space-y-4">
-              <div className="relative">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email address"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white font-light focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent focus:bg-white/10 transition-all duration-300 placeholder:text-slate-500"
-                />
-              </div>
-              <button 
-                type="button"
-                className="w-full relative overflow-hidden rounded-xl bg-white px-6 py-3.5 font-bold text-[#020617] transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] group flex items-center justify-center gap-2"
-              >
-                <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
-                  <div className="relative h-full w-8 bg-white/40" />
-                </div>
-                <span className="relative z-10 text-sm tracking-wide uppercase">Request Access</span>
-                <Send size={16} className="relative z-10 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-              </button>
-            </form>
-          </div>
         </div>
+
         
         <div ref={bottomBarRef} className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
           

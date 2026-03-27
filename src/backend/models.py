@@ -8,9 +8,15 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    image_url = db.Column(db.String(500), nullable=True) # Added for Profile Pictures
 
     def to_dict(self):
-        return {"id": self.id, "username": self.username, "email": self.email}
+        return {
+            "id": self.id, 
+            "username": self.username, 
+            "email": self.email,
+            "image_url": self.image_url
+        }
 
 class Car(db.Model):
     __tablename__ = 'cars'

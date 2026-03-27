@@ -70,8 +70,8 @@ const PrivacyPolicy = () => {
           <h2 className="text-xl font-semibold text-white mb-4">Contact Our Privacy Team</h2>
           <p className="font-light mb-4">If you have any questions about this Privacy Policy, please contact us:</p>
           <div className="space-y-1">
-            <p className="text-brand-accent">Email: privacy@luxedrive.ma</p>
-            <p className="text-sm">Address: [Your Office Address], Casablanca, Morocco</p>
+            <p className="text-brand-accent">Email: ocationvoiture@gmail.com</p>
+            <p className="text-sm">Address: Oujda, Morocco</p>
           </div>
         </div>
       </div>

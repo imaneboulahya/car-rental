@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import seatLeonPic from '../../asset/seat leon.png';
 import { Shield, Award, Zap, Heart } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -127,8 +128,8 @@ export default function About() {
           <div className="mobile-fade w-full lg:w-[400px] xl:w-[500px] shrink-0 relative flex justify-center">
             <div className="relative rounded-[2rem] overflow-hidden shadow-2xl bg-white/5 border border-white/10 p-2 w-full">
               <img 
-                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200" 
-                alt="Luxury Experience" 
+                src={seatLeonPic} 
+                alt="Seat Leon" 
                 className="rounded-[1.5rem] w-full h-[500px] lg:h-[600px] object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>

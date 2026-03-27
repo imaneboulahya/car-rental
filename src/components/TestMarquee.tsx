@@ -39,7 +39,7 @@ function MarqueeCard({ car }: { car: any }) {
           <p className="text-brand-accent text-xs md:text-sm font-bold uppercase tracking-widest mb-1">{car.brand || 'Luxury'}</p>
           <h3 className="text-xl md:text-2xl font-display font-bold text-white leading-tight mb-2">{car.name}</h3>
           <div className="text-white font-medium">
-            <span className="text-lg md:text-xl font-bold">${displayPrice}</span>
+            <span className="text-lg md:text-xl font-bold">{displayPrice} DH</span>
             <span className="text-slate-400 text-xs md:text-sm"> / day</span>
           </div>
         </div>
