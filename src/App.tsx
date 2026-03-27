@@ -14,9 +14,32 @@ import History from './pages/History';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
+  
+  React.useLayoutEffect(() => {
+    // Reset scroll to top instantly
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant' as ScrollBehavior, // Force instant scroll
+    });
+    
+    // Fallback for document element
+    if (document.documentElement) {
+      document.documentElement.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant' as ScrollBehavior
+      });
+    }
+
+    // Secondary fallback with minimal delay for dynamically rendered content
+    const timeout = setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 0);
+
+    return () => clearTimeout(timeout);
   }, [pathname]);
+
   return null;
 }
 
