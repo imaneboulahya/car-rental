@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+
+// Layout Components
 import Navbar from './components/Navbar';
-import NavClients from './components/NavClients'; // Import the new Navbar
+import NavClients from './components/NavClients'; 
 import Footer from './components/Footer';
+
+// Pages
 import Home from './pages/Home'; 
 import Fleet from './pages/Fleet'; 
 import CarDetails from './pages/CarDetails';
@@ -10,20 +14,23 @@ import AdminLayout from './pages/admin/AdminLayout';
 import Login from './pages/Login'; 
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
-import History from './pages/History'; 
+import History from './pages/History';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
+/**
+ * ScrollToTop Component
+ * Resets the scroll position to the top of the page on every navigation.
+ */
 function ScrollToTop() {
   const { pathname } = useLocation();
   
   React.useLayoutEffect(() => {
-    // Reset scroll to top instantly
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'instant' as ScrollBehavior, // Force instant scroll
+      behavior: 'instant' as ScrollBehavior,
     });
     
-    // Fallback for document element
     if (document.documentElement) {
       document.documentElement.scrollTo({
         top: 0,
@@ -32,7 +39,6 @@ function ScrollToTop() {
       });
     }
 
-    // Secondary fallback with minimal delay for dynamically rendered content
     const timeout = setTimeout(() => {
       window.scrollTo(0, 0);
     }, 0);
@@ -43,29 +49,39 @@ function ScrollToTop() {
   return null;
 }
 
+/**
+ * LayoutWrapper Component
+ * Manages which Navbar and Footer to show based on the current URL and login status.
+ */
 const LayoutWrapper = ({ children, user }: { children: React.ReactNode, user: any }) => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
 
   return (
     <>
-      {/* If not admin: Show NavClients if user is logged in, else show guest Navbar */}
+      {/* Show NavClients if user is logged in, else show guest Navbar (unless in Admin) */}
       {!isAdminPath && (user ? <NavClients /> : <Navbar />)}
       
       <main className={!isAdminPath ? "min-h-screen" : ""}>
         {children}
       </main>
 
+      {/* Footer is hidden on Admin pages */}
       {!isAdminPath && <Footer />}
     </>
   );
 };
 
 export default function App() {
-  // Initialize state from localStorage so login persists on refresh
+  // Initialize user state from localStorage to maintain session on refresh
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+      console.error("Error parsing user from localStorage", error);
+      return null;
+    }
   });
 
   return (
@@ -73,15 +89,28 @@ export default function App() {
       <ScrollToTop />
       <LayoutWrapper user={user}>
         <Routes>
+          {/* Main Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/fleet" element={<Fleet />} /> 
-          <Route path="/profile" element={<Profile />} />
-          {/* Pass setUser to Login so it can update the App state */}
+          <Route path="/car/:id" element={<CarDetails />} />
+          
+          {/* Authentication */}
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/signup" element={<Signup />} />
+          
+          {/* Legal Pages */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          {/* Temporary route for Terms so the Footer link doesn't break */}
+          <Route path="/terms" element={<PrivacyPolicy />} /> 
+          
+          {/* User Specific */}
+          <Route path="/profile" element={<Profile />} />
           <Route path="/history" element={<History />} />
-          <Route path="/car/:id" element={<CarDetails />} />
+          
+          {/* Admin Dashboard */}
           <Route path="/admin/*" element={<AdminLayout />} />
+          
+          {/* Catch-all: Redirect to Home */}
           <Route path="*" element={<Home />} />
         </Routes>
       </LayoutWrapper>

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // ✅ AJOUT
+import { Link, useLocation } from 'react-router-dom'; // ✅ Consolidated import
 import { Instagram, Twitter, Facebook, Linkedin, ArrowUp, ChevronRight, Send } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -10,7 +10,7 @@ export default function Footer() {
   const gridRef = useRef<HTMLDivElement>(null);
   const bottomBarRef = useRef<HTMLDivElement>(null);
 
-  const location = useLocation(); // ✅ AJOUT
+  const location = useLocation();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -50,7 +50,7 @@ export default function Footer() {
 
     return () => ctx.revert();
 
-  }, [location.pathname]); // ✅ TRÈS IMPORTANT
+  }, [location.pathname]);
 
   return (
     <footer ref={footerRef} className="relative bg-[#020617] pt-24 pb-8 overflow-hidden border-t border-white/5">
@@ -90,12 +90,18 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <h4 className="text-white font-display font-bold mb-6 tracking-wide">Quick Links</h4>
             <ul className="space-y-4">
-              {['Home', 'Our Fleet', 'The Standard', 'Request Allocation', 'Contact'].map((item, i) => (
+              {[
+                { name: 'Home', path: '/' },
+                { name: 'Our Fleet', path: '/fleet' },
+                { name: 'The Standard', path: '#' },
+                { name: 'Request Allocation', path: '#' },
+                { name: 'Contact', path: '#' }
+              ].map((item, i) => (
                 <li key={i}>
-                  <a href="#" className="group flex items-center text-slate-400 hover:text-white transition-colors duration-300 font-light">
+                  <Link to={item.path} className="group flex items-center text-slate-400 hover:text-white transition-colors duration-300 font-light">
                     <ChevronRight size={14} className="opacity-0 -ml-4 mr-2 text-brand-accent transition-all duration-300 group-hover:opacity-100 group-hover:ml-0" />
-                    <span className="group-hover:translate-x-1 transition-transform duration-300">{item}</span>
-                  </a>
+                    <span className="group-hover:translate-x-1 transition-transform duration-300">{item.name}</span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -148,8 +154,8 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-sm text-slate-500 font-light">
             <p>© 2026 LuxeDrive. All rights reserved.</p>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-brand-accent transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-brand-accent transition-colors">Terms of Service</a>
+              <Link to="/privacy-policy" className="hover:text-brand-accent transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-brand-accent transition-colors">Terms of Service</Link>
             </div>
           </div>
 
