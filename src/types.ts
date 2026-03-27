@@ -57,7 +57,7 @@ export const CARS: Car[] = [
     name: 'Range Rover SV',
     brand: 'Land Rover',
     type: 'Sport',
-    pricePerDay: 3900,
+    pricePerDay: 1000,
     image: rangePic,
     status: 'Available',
     specs: {
@@ -90,7 +90,7 @@ export const CARS: Car[] = [
     name: 'G-Wagon G63',
     brand: 'Mercedes',
     type: 'SUV',
-    pricePerDay: 5000,
+    pricePerDay: 800,
     image: benzPic,
     status: 'Available',
     specs: {
@@ -106,7 +106,7 @@ export const CARS: Car[] = [
     name: 'Hundai Tucson N Line',
     brand: 'Hundai',
     type: 'Luxury',
-    pricePerDay: 700,
+    pricePerDay: 600,
     image: tucsonPic,
     status: 'Available',
     specs: {
@@ -122,7 +122,7 @@ export const CARS: Car[] = [
     name: 'golf 8r',
     brand: 'Volkswagen',
     type: 'Sport',
-    pricePerDay: 1000,
+    pricePerDay: 900,
     image: golfPic,
     status: 'Maintenance',
     specs: {

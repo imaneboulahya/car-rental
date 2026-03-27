@@ -7,7 +7,7 @@ export default function ClientNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('luxe-theme') || 'midnight');
-  
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -32,12 +32,12 @@ export default function ClientNavbar() {
 
   // 3. Smart Navigation Logic
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    setIsMobileMenuOpen(false); 
-    
+    setIsMobileMenuOpen(false);
+
     if (href.startsWith('#')) {
       e.preventDefault();
       const id = href.replace('#', '');
-      
+
       if (location.pathname === '/') {
         const element = document.getElementById(id);
         element?.scrollIntoView({ behavior: 'smooth' });
@@ -49,9 +49,9 @@ export default function ClientNavbar() {
 
   // Actual Logout Logic
   const handleLogout = () => {
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('user');
     console.log("Logged out successfully");
-    window.location.href = '/'; 
+    window.location.href = '/';
   };
 
   const navLinks = [
@@ -63,21 +63,20 @@ export default function ClientNavbar() {
 
   return (
     <>
-      <nav 
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-          isScrolled 
-            ? 'bg-[var(--bg-nav)] backdrop-blur-xl border-b border-[var(--border)] py-3 shadow-xl' 
+      <nav
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${isScrolled
+            ? 'bg-[var(--bg-nav)] backdrop-blur-xl border-b border-[var(--border)] py-3 shadow-xl'
             : 'bg-transparent py-6'
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          
+
           {/* LOGO */}
           <Link to="/" className="flex items-center z-[110]" onClick={() => setIsMobileMenuOpen(false)}>
             <div className="h-10 md:h-12 w-auto flex items-center justify-center overflow-hidden transition-all duration-500">
-              <img 
-                src="../../asset/logo.jpeg" 
-                alt="LuxeDrive Logo" 
+              <img
+                src="../../asset/logo.jpeg"
+                alt="LuxeDrive Logo"
                 className="h-full w-auto object-contain"
               />
             </div>
@@ -103,14 +102,13 @@ export default function ClientNavbar() {
 
           {/* DESKTOP ACTIONS */}
           <div className="hidden lg:flex items-center gap-6">
-            <div 
+            <div
               className="relative py-3"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <button className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${
-                isHovered ? 'bg-blue-600 text-white border-blue-600' : 'border-[var(--border)] text-[var(--text-muted)]'
-              }`}>
+              <button className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${isHovered ? 'bg-blue-600 text-white border-blue-600' : 'border-[var(--border)] text-[var(--text-muted)]'
+                }`}>
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${isHovered ? 'bg-white text-blue-600' : 'bg-blue-600/20 text-blue-500'}`}>
                   {client.username.charAt(0).toUpperCase()}
                 </div>
@@ -118,9 +116,8 @@ export default function ClientNavbar() {
                 <ChevronDown size={14} className={`transition-transform duration-300 ${isHovered ? 'rotate-180' : ''}`} />
               </button>
 
-              <div className={`absolute right-0 top-full pt-1 w-64 transition-all duration-300 origin-top-right z-50 ${
-                isHovered ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
-              }`}>
+              <div className={`absolute right-0 top-full pt-1 w-64 transition-all duration-300 origin-top-right z-50 ${isHovered ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+                }`}>
                 <div className="bg-[var(--bg-dropdown)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-2xl p-2 backdrop-blur-3xl">
                   <div className="px-4 py-3 mb-2 border-b border-[var(--border)]">
                     <p className="text-xs font-bold text-[var(--text-main)]">{client.username}</p>
@@ -146,7 +143,7 @@ export default function ClientNavbar() {
               </div>
             </div>
 
-            <Link 
+            <Link
               to="/fleet"
               className="bg-blue-600 text-white px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
             >
@@ -161,9 +158,8 @@ export default function ClientNavbar() {
       </nav>
 
       {/* MOBILE MENU */}
-      <div className={`fixed inset-0 z-[90] bg-[var(--bg-nav)] backdrop-blur-3xl transition-transform duration-700 lg:hidden flex flex-col justify-center px-10 overflow-y-auto ${
-        isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      <div className={`fixed inset-0 z-[90] bg-[var(--bg-nav)] backdrop-blur-3xl transition-transform duration-700 lg:hidden flex flex-col justify-center px-10 overflow-y-auto ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}>
         <div className="flex flex-col gap-6 mt-16">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 bg-blue-600/20 border border-blue-500/30 rounded-xl flex items-center justify-center text-blue-500 font-black text-xl">
@@ -178,9 +174,9 @@ export default function ClientNavbar() {
           <hr className="border-[var(--border)] mb-2" />
 
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              to={link.href.startsWith('#') ? "/" + link.href : link.href} 
+            <Link
+              key={link.name}
+              to={link.href.startsWith('#') ? "/" + link.href : link.href}
               onClick={(e) => link.href.startsWith('#') && handleNavClick(e as any, link.href)}
               className="text-4xl font-black text-[var(--text-main)] hover:text-blue-500 transition-colors"
             >
