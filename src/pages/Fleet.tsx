@@ -129,23 +129,49 @@ function BookingModal({ car, onClose }: { car: any, onClose: () => void }) {
       return;
     }
 
-    // CREATE BOOKING TAGGED TO CURRENT USER EMAIL
-    const newBooking = {
-      id: Date.now(),
-      userEmail: user.email, // THIS LINKS IT TO THE SPECIFIC USER
+    const reservationData = {
       carName: car.name,
-      image: car.image,
-      dateRange: `${dates.pickUp} to ${dates.dropOff}`,
-      price: car.displayPrice,
-      status: 'Confirmed'
+      clientName: user.username || user.email,
+      clientEmail: user.email,
+      startDate: dates.pickUp,
+      endDate: dates.dropOff,
+      totalPrice: car.displayPrice,
+      carImage: car.image
     };
 
-    const existingHistory = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
-    localStorage.setItem('luxedrive_bookings', JSON.stringify([newBooking, ...existingHistory]));
+    // CALL BACKEND API TO SAVE IN DATABASE
+    fetch('http://127.0.0.1:8080/api/reservations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reservationData)
+    })
+    .then(async (response) => {
+      const data = await response.json();
+      if (response.ok) {
+        // ALSO KEEP IN LOCAL STORAGE FOR INSTANT UI UPDATES OR AS CACHE
+        const newBooking = {
+          id: data.id, 
+          userEmail: user.email,
+          carName: car.name,
+          image: car.image,
+          dateRange: `${dates.pickUp} to ${dates.dropOff}`,
+          price: car.displayPrice,
+          status: 'Pending'
+        };
+        const existingHistory = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
+        localStorage.setItem('luxedrive_bookings', JSON.stringify([newBooking, ...existingHistory]));
 
-    alert(`Success! Your ${car.name} is reserved.`);
-    onClose();
-    navigate('/history');
+        alert(`Success! Your ${car.name} is reserved.`);
+        onClose();
+        navigate('/history');
+      } else {
+        alert(`Error: ${data.details || "Could not save reservation."}`);
+      }
+    })
+    .catch(err => {
+      console.error("Booking error:", err);
+      alert("Backend error: Could not reach the server.");
+    });
   };
 
   return (

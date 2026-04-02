@@ -1,25 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Reservation } from '../../types';
 import { Check, X, Mail, Calendar, CreditCard, ChevronRight, ArrowUpRight } from 'lucide-react';
 
 const AdminReservations = () => {
-  const [bookings, setBookings] = useState<Reservation[]>([
-    {
-      id: 'RES-001',
-      carId: '2',
-      carName: 'Porsche 911 Carrera',
-      clientName: 'Ayoub Designer',
-      clientEmail: 'ayoub@example.com',
-      startDate: '2026-03-12',
-      endDate: '2026-03-15',
-      totalPrice: 1350,
-      status: 'Pending',
-      createdAt: '2026-03-08'
-    }
-  ]);
+  const [bookings, setBookings] = useState<Reservation[]>([]);
 
+  // 1. Fetch all reservations from the database
+  const loadAllBookings = () => {
+    fetch('http://127.0.0.1:8080/api/reservations')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setBookings(data);
+        }
+      })
+      .catch(err => console.error("Error loading admin bookings:", err));
+  };
+
+  useEffect(() => {
+    loadAllBookings();
+  }, []);
+
+  // 2. Update reservation status in the database
   const updateStatus = (id: string, newStatus: 'Confirmed' | 'Cancelled') => {
-    setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
+    fetch(`http://127.0.0.1:8080/api/reservations/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    })
+    .then(res => {
+      if (res.ok) {
+        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
+      }
+    })
+    .catch(err => console.error("Error updating status:", err));
   };
 
   return (

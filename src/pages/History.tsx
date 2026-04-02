@@ -5,15 +5,39 @@ import { Link } from 'react-router-dom';
 export default function History() {
   const [bookings, setBookings] = useState([]);
 
-  // 1. Load and Filter Bookings
+  // 1. Fetch Reservations from Backend
   const loadBookings = () => {
     const user = JSON.parse(localStorage.getItem('user') || 'null');
-    const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
+    if (!user || !user.email) return;
 
-    if (user && user.email) {
-      const myBookings = allBookings.filter((book: any) => book.userEmail === user.email);
-      setBookings(myBookings);
-    }
+    fetch('http://127.0.0.1:8080/api/reservations')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          // Filter by user email on the client side
+          const myBookings = data.filter((book: any) => book.clientEmail === user.email);
+          
+          // Re-map backend fields to match UI expectations
+          const formattedBookings = myBookings.map((b: any) => ({
+            id: b.id,
+            carName: b.carName,
+            clientEmail: b.clientEmail,
+            dateRange: `${b.startDate} to ${b.endDate}`,
+            price: `${b.totalPrice}dh`,
+            status: b.status,
+            // Fallback image if not in DB (UI will handle missing images)
+            image: b.image || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=800"
+          }));
+
+          setBookings(formattedBookings);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load bookings:", err);
+        // Fallback to localStorage if API fails
+        const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
+        setBookings(allBookings.filter((book: any) => book.userEmail === user.email));
+      });
   };
 
   useEffect(() => {
@@ -21,21 +45,32 @@ export default function History() {
   }, []);
 
   // 2. Cancellation Logic
-  const handleCancel = (bookingId: number, carName: string) => {
+  const handleCancel = (bookingId: string, carName: string) => {
     const confirmCancel = window.confirm(`Are you sure you want to cancel your reservation for the ${carName}?`);
     
     if (confirmCancel) {
-      // Get all bookings from global storage
-      const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
-      
-      // Filter out the one we want to delete
-      const updatedAllBookings = allBookings.filter((book: any) => book.id !== bookingId);
-      
-      // Save the global list back to localStorage
-      localStorage.setItem('luxedrive_bookings', JSON.stringify(updatedAllBookings));
-      
-      // Refresh the local state to update the UI
-      loadBookings();
+      // 1. Delete from Backend Database
+      fetch(`http://127.0.0.1:8080/api/reservations/${bookingId}`, {
+        method: 'DELETE',
+      })
+      .then(async (response) => {
+        const data = await response.json();
+        if (response.ok) {
+          // 2. Also update localStorage for consistency
+          const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
+          const updatedAllBookings = allBookings.filter((book: any) => book.id !== bookingId);
+          localStorage.setItem('luxedrive_bookings', JSON.stringify(updatedAllBookings));
+          
+          alert("Your reservation has been canceled.");
+          loadBookings(); // Refresh the list from the database
+        } else {
+          alert(`Error: ${data.error || "Could not cancel reservation."}`);
+        }
+      })
+      .catch(err => {
+        console.error("Cancellation error:", err);
+        alert("Server error: Could not reach the database.");
+      });
     }
   };
 

@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(80) UNIQUE NOT NULL,
     email VARCHAR(120) UNIQUE NOT NULL,
-    password VARCHAR(200) NOT NULL
+    password VARCHAR(200) NOT NULL,
+    image_url VARCHAR(500)
 );
 
 CREATE TABLE IF NOT EXISTS cars (
@@ -25,7 +26,8 @@ CREATE TABLE IF NOT EXISTS reservations (
     start_date VARCHAR(20),
     end_date VARCHAR(20),
     total_price INTEGER,
-    status VARCHAR(20) DEFAULT 'Pending'
+    status VARCHAR(20) DEFAULT 'Pending',
+    car_image VARCHAR(500)
 );
 
 INSERT INTO users (username, email, password)

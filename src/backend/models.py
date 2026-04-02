@@ -48,10 +48,12 @@ class Reservation(db.Model):
     end_date = db.Column(db.String(20))
     total_price = db.Column(db.Integer)
     status = db.Column(db.String(20), default="Pending")
+    car_image = db.Column(db.String(500), nullable=True)
 
     def to_dict(self):
         return {
             "id": self.id, "carName": self.car_name, "clientName": self.client_name,
             "clientEmail": self.client_email, "startDate": self.start_date,
-            "endDate": self.end_date, "totalPrice": self.total_price, "status": self.status
+            "endDate": self.end_date, "totalPrice": self.total_price, "status": self.status,
+            "image": self.car_image
         }
