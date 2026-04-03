@@ -3,9 +3,9 @@ import seatLeonPic from '../../asset/seat leon.png';
 import { Shield, Award, Zap, Heart } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import BorderGlow from './BorderGlow';
 
 export default function About() {
-  // We need two refs for a perfect pin: one for the outer boundary, one for the sliding track
   const outerRef = useRef<HTMLDivElement>(null);
   const scrollTrackRef = useRef<HTMLDivElement>(null);
 
@@ -39,11 +39,10 @@ export default function About() {
       let mm = gsap.matchMedia();
 
       // --- DESKTOP: Bulletproof Horizontal Scroll ---
-      mm.add("(min-width: 1024px)", () => { // Moved to lg breakpoint for safer desktop handling
+      mm.add("(min-width: 1024px)", () => { 
         const track = scrollTrackRef.current;
         
         if (track) {
-          // Calculate the exact distance to scroll
           const getScrollAmount = () => track.scrollWidth - window.innerWidth;
 
           const tween = gsap.to(track, {
@@ -58,7 +57,7 @@ export default function About() {
             pin: true,
             animation: tween,
             scrub: 1,
-            invalidateOnRefresh: true, // Recalculates if user resizes the window
+            invalidateOnRefresh: true, 
           });
         }
       });
@@ -89,27 +88,25 @@ export default function About() {
   }, []);
 
   return (
-    // OUTER WRAPPER: This is what GSAP actually pins to the screen
     <section 
       ref={outerRef} 
       id="about" 
       className="bg-[#020617] relative overflow-hidden"
     >
-      {/* Ambient Background Glows - Fixed to outer wrapper so they don't slide */}
+      {/* Ambient Background Glows */}
       <div className="absolute top-1/4 left-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[150px] mix-blend-screen pointer-events-none" />
       <div className="absolute bottom-1/4 right-[20%] w-[600px] h-[600px] bg-[#00d2ff]/10 rounded-full blur-[150px] mix-blend-screen pointer-events-none" />
 
-      {/* INNER VIEWPORT: h-screen on desktop to lock it perfectly in view */}
       <div className="lg:h-screen w-full flex items-center py-20 lg:py-0">
         
-        {/* THE TRACK: This is the massive horizontal div that actually slides left */}
+        {/* THE TRACK: Adjusted gap from lg:gap-32 to lg:gap-16 */}
         <div 
           ref={scrollTrackRef} 
-          className="flex flex-col lg:flex-row items-center gap-16 lg:gap-32 px-6 lg:px-[10vw] w-full lg:w-max h-auto"
+          className="flex flex-col lg:flex-row items-center gap-10 lg:gap-5 px-6 lg:px-[10vw] w-full lg:w-max h-auto"
         >
 
-          {/* --- BLOCK 1: The Giant Hook --- */}
-          <div className="mobile-fade w-full lg:w-[45vw] shrink-0 flex flex-col justify-center">
+          {/* --- BLOCK 1: Adjusted width from lg:w-[45vw] to lg:w-[38vw] --- */}
+          <div className="mobile-fade w-full lg:w-[38vw] shrink-0 flex flex-col justify-center">
             <div className="w-16 h-1 bg-[#00d2ff] rounded-full mb-8 shadow-[0_0_15px_rgba(0,210,255,0.5)]" />
             
             <h2 className="text-3xl md:text-6xl lg:text-[4rem] font-display font-black text-white mb-6 leading-[1.05] tracking-tight pr-4">
@@ -124,7 +121,6 @@ export default function About() {
           </div>
 
           {/* --- BLOCK 2: Cinematic Hero Image --- */}
-          {/* Strictly defining width/height to prevent layout shifts when the image loads */}
           <div className="mobile-fade w-full lg:w-[400px] xl:w-[500px] shrink-0 relative flex justify-center">
             <div className="relative rounded-[2rem] overflow-hidden shadow-2xl bg-white/5 border border-white/10 p-2 w-full">
               <img 
@@ -145,21 +141,36 @@ export default function About() {
           </div>
 
           {/* --- BLOCK 3: The Horizontal Feature Cards --- */}
-          <div className="w-full lg:w-max shrink-0 flex flex-col lg:flex-row gap-6 lg:gap-8 lg:pr-[10vw]">
+          {/* Added lg:ml-8 here to keep a bit of extra breathing room between the car and the cards */}
+          <div className="w-full lg:w-max shrink-0 flex flex-col lg:flex-row gap-6 lg:gap-8 lg:pr-[10vw] lg:ml-8">
             {features.map((feature, index) => (
               <div 
                 key={index} 
-                className="mobile-fade w-full lg:w-[320px] shrink-0 p-8 rounded-[2rem] bg-[#0f172a]/80 backdrop-blur-md border border-white/5 hover:bg-slate-800/80 hover:border-[#00d2ff]/30 transition-all duration-500 group shadow-xl"
+                className="mobile-fade w-full lg:w-[320px] shrink-0 h-full"
               >
-                <div className="w-16 h-16 rounded-2xl bg-[#020617] border border-white/10 flex items-center justify-center text-[#00d2ff] mb-8 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(0,210,255,0.2)] transition-all duration-500">
-                  {feature.icon}
-                </div>
-                <h4 className="text-white font-display font-bold text-2xl mb-4 tracking-wide">
-                  {feature.title}
-                </h4>
-                <p className="text-slate-400 text-sm leading-relaxed font-medium">
-                  {feature.description}
-                </p>
+                <BorderGlow
+                  edgeSensitivity={30}
+                  glowColor="0 210 255" 
+                  backgroundColor="#0f172a" 
+                  borderRadius={32} 
+                  glowRadius={40}
+                  glowIntensity={1}
+                  coneSpread={25}
+                  animated={true} 
+                  colors={['#00d2ff', '#3b82f6', '#020617']} 
+                >
+                  <div className="p-8 h-full flex flex-col group">
+                    <div className="w-16 h-16 rounded-2xl bg-[#020617] border border-white/10 flex items-center justify-center text-[#00d2ff] mb-8 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(0,210,255,0.2)] transition-all duration-500">
+                      {feature.icon}
+                    </div>
+                    <h4 className="text-white font-display font-bold text-2xl mb-4 tracking-wide">
+                      {feature.title}
+                    </h4>
+                    <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                      {feature.description}
+                    </p>
+                  </div>
+                </BorderGlow>
               </div>
             ))}
           </div>

@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import { CARS } from '../types';
+import LiquidEther from './LiquidEther';
 
 export default function Hero() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -83,8 +84,29 @@ export default function Hero() {
   return (
     <section ref={sectionRef} className="relative min-h-screen bg-slate-950 overflow-hidden flex items-center justify-center">
       
-      {/* Background Gradients */}
-      <div className="absolute inset-0 bg-[#000000] -z-30" />
+      {/* LiquidEther Background Effect */}
+      <div className="absolute inset-0 -z-40">
+        <LiquidEther
+          colors={[ '#5227FF', '#FF9FFC', '#B19EEF' ]}
+          mouseForce={8}
+          cursorSize={100}
+          isViscous
+          viscous={30}
+          iterationsViscous={32}
+          iterationsPoisson={32}
+          resolution={0.5}
+          isBounce={false}
+          autoDemo
+          autoSpeed={0.5}
+          autoIntensity={2.2}
+          takeoverDuration={0.25}
+          autoResumeDelay={3000}
+          autoRampDuration={0.6}
+        
+        />
+      </div>
+      {/* Semi-transparent overlay to ensure text readability */}
+      <div className="absolute inset-0 bg-[#000000]/60 -z-30" />
       <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-blue-600/10 blur-[120px] -z-20" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-900/10 blur-[120px] -z-20" />
 
