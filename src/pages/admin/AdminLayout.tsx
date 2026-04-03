@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { LayoutDashboard, Car, CalendarCheck, LogOut, Menu, X } from 'lucide-react';
 import AdminCars from './AdminCars';
 import AdminReservations from './AdminReservations';
+import logoPic from '../../../asset/logo.jpeg';
 
 const AdminLayout = () => {
   const [activeTab, setActiveTab] = useState<'cars' | 'reservations'>('cars');
@@ -23,15 +24,20 @@ const AdminLayout = () => {
           <div className="flex items-center justify-between h-20">
             
             {/* Logo area */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                 <Car size={20} className="text-white" />
+            <Link to="/" className="flex items-center gap-4">
+              <div className="h-12 w-auto flex items-center">
+                <img 
+                  src={logoPic} 
+                  alt="LuxeDrive Logo" 
+                  className="h-full w-auto object-contain"
+                />
               </div>
-              <h2 className="text-xl font-black tracking-tight text-white hidden sm:flex items-center gap-2">
-                LUXE<span className="text-blue-500">DRIVE</span>
-                <span className="text-[9px] uppercase tracking-widest text-slate-400 border border-slate-700 px-2 py-0.5 rounded-md bg-slate-800/50">Admin</span>
-              </h2>
-            </div>
+              <div className="flex items-center">
+                <span className="px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.25em] text-blue-400 border border-blue-500/20 rounded-lg bg-blue-500/5 backdrop-blur-md">
+                  ADMIN <span className="text-slate-500 opacity-50 ml-1.5">PANEL</span>
+                </span>
+              </div>
+            </Link>
 
             {/* Desktop Tabs */}
             <nav className="hidden md:flex items-center gap-2 bg-[#151921] p-1.5 rounded-2xl border border-slate-800/50">

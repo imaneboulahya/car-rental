@@ -1,52 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CARS } from '../../types';
 import { Plus, Edit3, Trash2, Users, Fuel, GaugeCircle, X, UploadCloud } from 'lucide-react';
 
 const AdminCars = () => {
   // 1. Initialize State
-  const [cars, setCars] = useState(() => {
-    const savedCars = localStorage.getItem('luxedrive_fleet');
-    return savedCars ? JSON.parse(savedCars) : CARS;
-  });
-  
+  const [cars, setCars] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingCar, setEditingCar] = useState<any>(null); // Tracks which car is being edited
+  const [editingCar, setEditingCar] = useState<any>(null);
 
-  // 2. Add Handler
-  const handleAddCar = (newCar: any) => {
-    const updatedFleet = [newCar, ...cars];
-    setCars(updatedFleet);
-    localStorage.setItem('luxedrive_fleet', JSON.stringify(updatedFleet));
-    setIsAddModalOpen(false);
+  // 2. Fetch Cars from API
+  const fetchCars = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8080/api/cars');
+      const data = await response.json();
+      if (response.ok) setCars(data);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // 3. Edit Handler
-  const handleEditCar = (updatedCar: any) => {
-    const updatedFleet = cars.map((car: any) => car.id === updatedCar.id ? updatedCar : car);
-    setCars(updatedFleet);
-    localStorage.setItem('luxedrive_fleet', JSON.stringify(updatedFleet));
-    setEditingCar(null); // Close the edit modal
+  useEffect(() => {
+    fetchCars();
+  }, []);
+
+  // 3. Add Handler
+  const handleAddCar = async (newCar: any) => {
+    try {
+      const response = await fetch('http://127.0.0.1:8080/api/cars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCar)
+      });
+      if (response.ok) {
+        await fetchCars(); // Refresh list
+        setIsAddModalOpen(false);
+      }
+    } catch (error) {
+      alert("Failed to add car");
+    }
   };
 
-  // 4. Delete Handler
-  const handleDeleteCar = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this asset? This action cannot be undone.")) {
-      const updatedFleet = cars.filter((car: any) => car.id !== id);
-      setCars(updatedFleet);
-      localStorage.setItem('luxedrive_fleet', JSON.stringify(updatedFleet));
+  // 4. Edit Handler
+  const handleEditCar = async (updatedCar: any) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8080/api/cars/${updatedCar.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedCar)
+      });
+      if (response.ok) {
+        await fetchCars(); // Refresh list
+        setEditingCar(null);
+      }
+    } catch (error) {
+      alert("Failed to update car");
+    }
+  };
+
+  // 5. Delete Handler
+  const handleDeleteCar = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this asset?")) {
+      try {
+        const response = await fetch(`http://127.0.0.1:8080/api/cars/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          await fetchCars(); // Refresh list
+        }
+      } catch (error) {
+        alert("Failed to delete car");
+      }
     }
   };
 
   const handleResetFleet = () => {
-    if(window.confirm('Are you sure you want to reset the fleet to default? This deletes custom cars.')) {
-      setCars(CARS);
-      localStorage.removeItem('luxedrive_fleet');
+    if (window.confirm('This action is disabled when using the database. Add/Delete cars individually.')) {
+      // Logic for reset could be a 're-seed' API calls if requested
     }
   };
 
   return (
     <div className="animate-in fade-in duration-700 relative">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sm:mb-12">
         <div>
@@ -54,13 +92,13 @@ const AdminCars = () => {
           <p className="text-slate-500 text-sm mt-1">Real-time status of your luxury fleet.</p>
         </div>
         <div className="flex w-full sm:w-auto gap-3">
-          <button 
+          <button
             onClick={handleResetFleet}
             className="flex-1 sm:flex-none px-4 py-3 rounded-2xl font-bold text-sm transition-all text-slate-400 bg-slate-800/50 hover:bg-slate-800 hover:text-white"
           >
             Reset
           </button>
-          <button 
+          <button
             onClick={() => setIsAddModalOpen(true)}
             className="flex-[2] sm:flex-none bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] flex items-center justify-center gap-2 active:scale-95"
           >
@@ -87,14 +125,17 @@ const AdminCars = () => {
 
           return (
             <div key={car.id} className="bg-[#151921] border border-slate-800/50 rounded-[2rem] overflow-hidden hover:border-slate-700 transition-all group shadow-2xl flex flex-col sm:flex-row">
-              
+
               {/* Image Container */}
               <div className="relative w-full sm:w-48 h-56 sm:h-auto overflow-hidden shrink-0 bg-slate-900">
-                <img src={car.image} className="absolute inset-0 w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" alt={car.name} />
+                <img 
+                  src={car.image.startsWith('http') || car.image.startsWith('data:') ? car.image : `http://127.0.0.1:8080${car.image}`} 
+                  className="absolute inset-0 w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" 
+                  alt={car.name} 
+                />
                 <div className="absolute top-4 left-4">
-                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border ${
-                    car.status === 'Available' ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' : 'bg-orange-500/20 border-orange-500/30 text-orange-400'
-                  } text-[10px] font-black uppercase tracking-widest`}>
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border ${car.status === 'Available' ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' : 'bg-orange-500/20 border-orange-500/30 text-orange-400'
+                    } text-[10px] font-black uppercase tracking-widest`}>
                     <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${car.status === 'Available' ? 'bg-emerald-400' : 'bg-orange-400'}`} />
                     {car.status || 'Available'}
                   </div>
@@ -116,29 +157,29 @@ const AdminCars = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2 sm:gap-4 mt-4">
-                    <Spec icon={<Users size={12}/>} value={displaySeats} />
-                    <Spec icon={<Fuel size={12}/>} value={displayFuel} />
-                    <Spec icon={<GaugeCircle size={12}/>} value={displayTrans} />
+                    <Spec icon={<Users size={12} />} value={displaySeats} />
+                    <Spec icon={<Fuel size={12} />} value={displayFuel} />
+                    <Spec icon={<GaugeCircle size={12} />} value={displayTrans} />
                   </div>
                 </div>
 
                 {/* --- ACTION BUTTONS UPDATED HERE --- */}
                 <div className="flex justify-end gap-4 mt-6 pt-4 border-t border-slate-800/50">
-                  <button 
+                  <button
                     onClick={() => setEditingCar(car)}
                     className="text-slate-500 hover:text-blue-400 transition-colors bg-slate-800/30 p-2 rounded-lg border border-slate-700/50 hover:border-blue-500/30"
                   >
-                    <Edit3 size={16}/>
+                    <Edit3 size={16} />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDeleteCar(car.id)}
                     className="text-slate-500 hover:text-rose-400 transition-colors bg-slate-800/30 p-2 rounded-lg border border-slate-700/50 hover:border-rose-500/30"
                   >
-                    <Trash2 size={16}/>
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>
-              
+
             </div>
           );
         })}
@@ -146,18 +187,18 @@ const AdminCars = () => {
 
       {/* Render Add Modal */}
       {isAddModalOpen && (
-        <CarFormModal 
-          onClose={() => setIsAddModalOpen(false)} 
-          onSubmit={handleAddCar} 
+        <CarFormModal
+          onClose={() => setIsAddModalOpen(false)}
+          onSubmit={handleAddCar}
         />
       )}
 
       {/* Render Edit Modal (passes initialData down) */}
       {editingCar && (
-        <CarFormModal 
+        <CarFormModal
           initialData={editingCar}
-          onClose={() => setEditingCar(null)} 
-          onSubmit={handleEditCar} 
+          onClose={() => setEditingCar(null)}
+          onSubmit={handleEditCar}
         />
       )}
     </div>
@@ -166,7 +207,7 @@ const AdminCars = () => {
 
 // --- SMART FORM MODAL (Handles both Add and Edit) ---
 const CarFormModal = ({ onClose, onSubmit, initialData }: { onClose: () => void, onSubmit: (car: any) => void, initialData?: any }) => {
-  
+
   // If initialData exists (Edit mode), populate the form. Otherwise (Add mode), leave it empty.
   const [formData, setFormData] = useState(() => {
     if (initialData) {
@@ -199,7 +240,7 @@ const CarFormModal = ({ onClose, onSubmit, initialData }: { onClose: () => void,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const submittedCar = {
       // If editing, keep the old ID. If adding, generate a new one.
       id: initialData ? initialData.id : Math.random().toString(36).substr(2, 9),
@@ -209,21 +250,21 @@ const CarFormModal = ({ onClose, onSubmit, initialData }: { onClose: () => void,
       pricePerDay: Number(formData.pricePerDay),
       image: formData.image || 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&q=80',
       status: initialData ? initialData.status : 'Available', // Preserve rented status if editing
-      specs: { 
-        seats: formData.seats, 
-        fuel: formData.fuel, 
-        transmission: formData.transmission, 
-        acceleration: formData.acceleration 
+      specs: {
+        seats: formData.seats,
+        fuel: formData.fuel,
+        transmission: formData.transmission,
+        acceleration: formData.acceleration
       }
     };
-    
+
     onSubmit(submittedCar);
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0B0E14]/80 backdrop-blur-sm animate-in fade-in">
       <div className="bg-[#151921] border border-slate-800 rounded-[2rem] shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden">
-        
+
         <div className="sticky top-0 bg-[#151921]/90 backdrop-blur-xl border-b border-slate-800/50 px-6 py-5 flex justify-between items-center z-10">
           <div>
             <h2 className="text-xl font-black text-white">{initialData ? 'Update Asset' : 'Add New Asset'}</h2>
@@ -264,22 +305,22 @@ const CarFormModal = ({ onClose, onSubmit, initialData }: { onClose: () => void,
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-800 pb-2">Primary Info</p>
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">Brand</label>
-                <input required type="text" placeholder="e.g. Porsche" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" value={formData.brand} onChange={(e) => setFormData({...formData, brand: e.target.value})} />
+                <input required type="text" placeholder="e.g. Ferrari" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" value={formData.brand} onChange={(e) => setFormData({ ...formData, brand: e.target.value })} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">Model Name</label>
-                <input required type="text" placeholder="e.g. 911 GT3 RS" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                <input required type="text" placeholder="e.g. 911 GT3 RS" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Category</label>
-                  <select className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm appearance-none" value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})}>
+                  <select className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm appearance-none" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })}>
                     <option>Sports</option><option>Luxury</option><option>SUV</option><option>Compact SUV</option><option>Luxury Sedan</option><option>Luxury SUV</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Price / Day (DH)</label>
-                  <input required type="number" placeholder="1500" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.pricePerDay} onChange={(e) => setFormData({...formData, pricePerDay: e.target.value})} />
+                  <input required type="number" placeholder="1500" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.pricePerDay} onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })} />
                 </div>
               </div>
             </div>
@@ -289,20 +330,20 @@ const CarFormModal = ({ onClose, onSubmit, initialData }: { onClose: () => void,
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Seats</label>
-                  <input required type="text" placeholder="2" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.seats} onChange={(e) => setFormData({...formData, seats: e.target.value})} />
+                  <input required type="text" placeholder="2" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.seats} onChange={(e) => setFormData({ ...formData, seats: e.target.value })} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Fuel Type</label>
-                  <input required type="text" placeholder="e.g. Petrol" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.fuel} onChange={(e) => setFormData({...formData, fuel: e.target.value})} />
+                  <input required type="text" placeholder="e.g. Petrol" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.fuel} onChange={(e) => setFormData({ ...formData, fuel: e.target.value })} />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">Transmission</label>
-                <input required type="text" placeholder="e.g. Automatic" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.transmission} onChange={(e) => setFormData({...formData, transmission: e.target.value})} />
+                <input required type="text" placeholder="e.g. Automatic" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.transmission} onChange={(e) => setFormData({ ...formData, transmission: e.target.value })} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">Acceleration</label>
-                <input required type="text" placeholder="e.g. 0-100 in 3.2s" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.acceleration} onChange={(e) => setFormData({...formData, acceleration: e.target.value})} />
+                <input required type="text" placeholder="e.g. 0-100 in 3.2s" className="w-full bg-[#0B0E14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all text-sm" value={formData.acceleration} onChange={(e) => setFormData({ ...formData, acceleration: e.target.value })} />
               </div>
             </div>
           </div>

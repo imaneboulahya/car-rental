@@ -76,6 +76,11 @@ def serve_avatar(filename):
     """Serves uploaded profile pictures so they appear in React."""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/asset/<filename>')
+def serve_asset(filename):
+    """Serves car assets so they appear in React."""
+    return send_from_directory('../../asset', filename)
+
 # --- 7. AUTHENTICATION ROUTES ---
 
 @app.route('/login', methods=['POST'])
@@ -163,6 +168,70 @@ def get_cars():
         return jsonify([car.to_dict() for car in cars])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/cars', methods=['POST'])
+def add_car():
+    data = request.json
+    try:
+        new_car = Car(
+            brand=data.get('brand'),
+            name=data.get('name'),
+            type=data.get('type'),
+            price_per_day=int(data.get('pricePerDay', 0)),
+            image_url=data.get('image'),
+            status=data.get('status', 'Available'),
+            seats=int(data.get('specs', {}).get('seats', 4)),
+            fuel=data.get('specs', {}).get('fuel', 'Petrol'),
+            transmission=data.get('specs', {}).get('transmission', 'Automatic'),
+            acceleration=data.get('specs', {}).get('acceleration', '0-100 in 3.0s')
+        )
+        db.session.add(new_car)
+        db.session.commit()
+        return jsonify(new_car.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to add car", "details": str(e)}), 500
+
+@app.route('/api/cars/<int:car_id>', methods=['PUT'])
+def update_car(car_id):
+    data = request.json
+    try:
+        car = Car.query.get(car_id)
+        if not car:
+            return jsonify({"error": "Car not found"}), 404
+        
+        car.brand = data.get('brand', car.brand)
+        car.name = data.get('name', car.name)
+        car.type = data.get('type', car.type)
+        car.price_per_day = int(data.get('pricePerDay', car.price_per_day))
+        car.image_url = data.get('image', car.image_url)
+        car.status = data.get('status', car.status)
+        
+        specs = data.get('specs', {})
+        car.seats = int(specs.get('seats', car.seats))
+        car.fuel = specs.get('fuel', car.fuel)
+        car.transmission = specs.get('transmission', car.transmission)
+        car.acceleration = specs.get('acceleration', car.acceleration)
+        
+        db.session.commit()
+        return jsonify(car.to_dict()), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to update car", "details": str(e)}), 500
+
+@app.route('/api/cars/<int:car_id>', methods=['DELETE'])
+def delete_car(car_id):
+    try:
+        car = Car.query.get(car_id)
+        if not car:
+            return jsonify({"error": "Car not found"}), 404
+        
+        db.session.delete(car)
+        db.session.commit()
+        return jsonify({"message": "Car deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to delete car", "details": str(e)}), 500
 
 @app.route('/api/reservations', methods=['GET'])
 def get_reservations():

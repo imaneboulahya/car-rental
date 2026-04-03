@@ -23,19 +23,30 @@ class Car(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(50))
     name = db.Column(db.String(100))
+    type = db.Column(db.String(50))
     price_per_day = db.Column(db.Integer)
-    image_url = db.Column(db.String(500))
+    image_url = db.Column(db.Text) # Use Text for long base64 strings
     status = db.Column(db.String(20), default="Available")
     seats = db.Column(db.Integer)
     fuel = db.Column(db.String(50))
     transmission = db.Column(db.String(50))
+    acceleration = db.Column(db.String(50))
 
     def to_dict(self):
         return {
-            "id": self.id, "brand": self.brand, "name": self.name,
-            "pricePerDay": self.price_per_day, "image": self.image_url,
+            "id": self.id, 
+            "brand": self.brand, 
+            "name": self.name,
+            "type": self.type,
+            "pricePerDay": self.price_per_day, 
+            "image": self.image_url,
             "status": self.status, 
-            "specs": {"seats": self.seats, "fuel": self.fuel, "transmission": self.transmission}
+            "specs": {
+                "seats": self.seats, 
+                "fuel": self.fuel, 
+                "transmission": self.transmission,
+                "acceleration": self.acceleration
+            }
         }
 
 class Reservation(db.Model):
