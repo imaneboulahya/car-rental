@@ -54,7 +54,7 @@ export default function Fleet() {
 
   return (
     <div className="relative min-h-screen bg-[#020617] text-white font-sans">
-      
+
       {/* DarkVeil Background Effect (Fixed so it stays while scrolling) */}
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
         <DarkVeil
@@ -98,13 +98,13 @@ export default function Fleet() {
                   className="reveal group bg-[#0f172a]/80 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:border-[#00d2ff]/50 transition-all duration-300 cursor-pointer flex flex-col shadow-lg hover:-translate-y-1"
                 >
                   <div className="relative h-56 overflow-hidden bg-slate-800">
-                  <img 
-                    src={car.image?.startsWith('http') || car.image?.startsWith('data:') ? car.image : `http://127.0.0.1:8080${car.image}`} 
-                    alt={car.name} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
-                </div>
+                    <img
+                      src={car.image?.startsWith('http') || car.image?.startsWith('data:') ? car.image : `http://127.0.0.1:8080${car.image}`}
+                      alt={car.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
+                  </div>
                   <div className="p-6 flex-1 flex flex-col z-10 -mt-2">
                     <div className="flex justify-between items-start mb-6">
                       <div>

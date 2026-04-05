@@ -128,10 +128,10 @@ const AdminCars = () => {
 
               {/* Image Container */}
               <div className="relative w-full sm:w-48 h-56 sm:h-auto overflow-hidden shrink-0 bg-slate-900">
-                <img 
-                  src={car.image.startsWith('http') || car.image.startsWith('data:') ? car.image : `http://127.0.0.1:8080${car.image}`} 
-                  className="absolute inset-0 w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" 
-                  alt={car.name} 
+                <img
+                  src={car.image.startsWith('http') || car.image.startsWith('data:') ? car.image : `http://127.0.0.1:8080${car.image}`}
+                  className="absolute inset-0 w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
+                  alt={car.name}
                 />
                 <div className="absolute top-4 left-4">
                   <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border ${car.status === 'Available' ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' : 'bg-orange-500/20 border-orange-500/30 text-orange-400'

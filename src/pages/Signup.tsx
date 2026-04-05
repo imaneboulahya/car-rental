@@ -10,17 +10,21 @@ export default function Signup() {
     email: '',
     password: ''
   });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // 2. Handle the submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
     
     // Combine names for your backend 'username' field, or just use email
     const userData = {
       username: `${formData.firstName}_${formData.lastName}`,
       email: formData.email,
-      password: formData.password // Note: You'll eventually want to hash this!
+      password: formData.password
     };
 
     try {
@@ -30,15 +34,17 @@ export default function Signup() {
         body: JSON.stringify(userData),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        alert("Account Created Successfully!");
         navigate('/login'); // Redirect to login page
       } else {
-        const errorData = await response.json();
-        alert("Error: " + (errorData.details || "Registration failed"));
+        setError(data.error || "Registration failed");
       }
-    } catch (error) {
-      alert("Could not connect to the backend server. Is Flask running?");
+    } catch (err) {
+      setError("Could not connect to the backend server. Is Flask running?");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,8 +117,19 @@ export default function Signup() {
               </div>
             </div>
 
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 group shadow-lg shadow-blue-600/20 mt-4">
-              Create Account
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-3 animate-shake">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                {error}
+              </div>
+            )}
+
+            <button 
+              type="submit" 
+              disabled={loading}
+              className={`w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 group shadow-lg shadow-blue-600/20 mt-4 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </form>

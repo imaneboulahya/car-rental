@@ -16,7 +16,7 @@ export default function History() {
         if (Array.isArray(data)) {
           // Filter by user email on the client side
           const myBookings = data.filter((book: any) => book.clientEmail === user.email);
-          
+
           // Re-map backend fields to match UI expectations
           const formattedBookings = myBookings.map((b: any) => ({
             id: b.id,
@@ -47,30 +47,30 @@ export default function History() {
   // 2. Cancellation Logic
   const handleCancel = (bookingId: string, carName: string) => {
     const confirmCancel = window.confirm(`Are you sure you want to cancel your reservation for the ${carName}?`);
-    
+
     if (confirmCancel) {
       // 1. Delete from Backend Database
       fetch(`http://127.0.0.1:8080/api/reservations/${bookingId}`, {
         method: 'DELETE',
       })
-      .then(async (response) => {
-        const data = await response.json();
-        if (response.ok) {
-          // 2. Also update localStorage for consistency
-          const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
-          const updatedAllBookings = allBookings.filter((book: any) => book.id !== bookingId);
-          localStorage.setItem('luxedrive_bookings', JSON.stringify(updatedAllBookings));
-          
-          alert("Your reservation has been canceled.");
-          loadBookings(); // Refresh the list from the database
-        } else {
-          alert(`Error: ${data.error || "Could not cancel reservation."}`);
-        }
-      })
-      .catch(err => {
-        console.error("Cancellation error:", err);
-        alert("Server error: Could not reach the database.");
-      });
+        .then(async (response) => {
+          const data = await response.json();
+          if (response.ok) {
+            // 2. Also update localStorage for consistency
+            const allBookings = JSON.parse(localStorage.getItem('luxedrive_bookings') || '[]');
+            const updatedAllBookings = allBookings.filter((book: any) => book.id !== bookingId);
+            localStorage.setItem('luxedrive_bookings', JSON.stringify(updatedAllBookings));
+
+            alert("Your reservation has been canceled.");
+            loadBookings(); // Refresh the list from the database
+          } else {
+            alert(`Error: ${data.error || "Could not cancel reservation."}`);
+          }
+        })
+        .catch(err => {
+          console.error("Cancellation error:", err);
+          alert("Server error: Could not reach the database.");
+        });
     }
   };
 
@@ -92,12 +92,12 @@ export default function History() {
         {bookings.length > 0 ? (
           <div className="grid gap-6">
             {bookings.map((book: any) => (
-              <div 
-                key={book.id} 
+              <div
+                key={book.id}
                 className="group bg-[#0f172a] border border-white/5 rounded-[2.5rem] p-4 md:p-6 flex flex-col md:flex-row items-center gap-8 hover:border-[#00d2ff]/30 transition-all duration-500 shadow-2xl relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-[60px] -mr-16 -mt-16 group-hover:bg-blue-600/10 transition-colors" />
-                
+
                 <div className="w-full md:w-56 h-36 bg-slate-800 rounded-[1.5rem] overflow-hidden relative">
                   <img src={book.image} alt={book.carName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 to-transparent" />
@@ -127,9 +127,9 @@ export default function History() {
                         <span className="text-2xl font-black text-white">{book.price}</span>
                         <span className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Total</span>
                       </div>
-                      
+
                       {/* --- CANCEL BUTTON --- */}
-                      <button 
+                      <button
                         onClick={() => handleCancel(book.id, book.carName)}
                         className="mt-2 flex items-center gap-2 text-rose-500 hover:text-rose-400 transition-colors text-[10px] font-bold uppercase tracking-widest group/btn"
                       >

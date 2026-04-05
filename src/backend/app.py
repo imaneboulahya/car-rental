@@ -8,6 +8,7 @@ import sys
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
+from flask_bcrypt import Bcrypt
 
 # --- 1. ENVIRONMENT & ENCODING FIXES ---
 load_dotenv()
@@ -17,6 +18,7 @@ if sys.platform == "win32":
     os.environ['PGCLIENTENCODING'] = 'utf-8'
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 # Allows React (Port 3000) to communicate with Flask (Port 8080)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -92,31 +94,46 @@ def login():
         return jsonify({"error": "Email and password are required"}), 400
 
     user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"error": "Invalid email or password."}), 401
 
-    if user and user.password == password:
-        return jsonify({
-            "message": "Login successful",
-            "user": user.to_dict() # Dictionary includes id and image_url
-        }), 200
-    return jsonify({"error": "Invalid email or password"}), 401
+    try:
+        if bcrypt.check_password_hash(user.password, password):
+            return jsonify({
+                "message": "Login successful",
+                "user": user.to_dict()
+            }), 200
+        return jsonify({"error": "Invalid email or password."}), 401
+    except Exception:
+        return jsonify({"error": "Invalid email or password."}), 401
 
 @app.route('/users', methods=['POST'])
 def signup():
     data = request.json
     if not data or not all(k in data for k in ("username", "email", "password")):
-        return jsonify({"error": "Missing required fields"}), 400
+        return jsonify({"error": "Please fill in all fields."}), 400
+
+    # 1. Check if user already exists
+    existing_user = User.query.filter_by(email=data.get('email')).first()
+    if existing_user:
+        return jsonify({"error": "This email is already registered."}), 400
+    # ---------------------------
+
     try:
+        # Hachage du mot de passe
+        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        
         new_user = User(
             username=data['username'], 
             email=data['email'], 
-            password=data['password'] 
+            password=hashed_password 
         )
         db.session.add(new_user)
         db.session.commit()
         return jsonify(new_user.to_dict()), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Could not create user", "details": str(e)}), 400
+        return jsonify({"error": "Failed to create account.", "details": str(e)}), 400
 
 # --- 8. USER PROFILE UPDATES ---
 

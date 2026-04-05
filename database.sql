@@ -32,10 +32,12 @@ CREATE TABLE IF NOT EXISTS reservations (
     car_image VARCHAR(500)
 );
 
+
 -- Register default admin if not exists
 INSERT INTO users (username, email, password)
-SELECT 'admin', 'admin@example.com', 'admin1234'
+SELECT 'admin', 'admin@example.com', '$2b$12$jLd7LFWFGXLAUHLedoOfiuTjgjanZ7M4WeBIHkka/gf9infJEcHga'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
+
 
 -- Clear and Seed cars
 DELETE FROM cars;
