@@ -175,6 +175,34 @@ def upload_avatar(user_id):
         return jsonify(user.to_dict()), 200
     return jsonify({"error": "Upload failed"}), 400
 
+@app.route('/api/users/<int:user_id>/password', methods=['PUT'])
+def update_password(user_id):
+    """Securely updates the user password with Bcrypt."""
+    data = request.json
+    current_pwd = data.get('currentPassword')
+    new_pwd = data.get('newPassword')
+
+    if not current_pwd or not new_pwd:
+        return jsonify({"error": "Missing current or new password"}), 400
+
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Verify current password
+        if not bcrypt.check_password_hash(user.password, current_pwd):
+            return jsonify({"error": "Incorrect current password"}), 401
+
+        # Hash and save new password
+        user.password = bcrypt.generate_password_hash(new_pwd).decode('utf-8')
+        db.session.commit()
+
+        return jsonify({"message": "Password updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Password update failed", "details": str(e)}), 500
+
 # --- 9. FLEET & RESERVATION ROUTES ---
 
 @app.route('/api/cars', methods=['GET'])
