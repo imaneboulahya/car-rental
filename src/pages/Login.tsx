@@ -6,10 +6,14 @@ import { Mail, Lock, ArrowRight } from 'lucide-react';
 export default function Login({ setUser }: { setUser: (user: any) => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
     
     try {
       const response = await fetch('http://127.0.0.1:8080/login', {
@@ -21,10 +25,7 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
       const data = await response.json();
 
       if (response.ok) {
-        // 1. Save to LocalStorage for persistence
         localStorage.setItem('user', JSON.stringify(data.user));
-        
-        // 2. Update App state to swap Navbar to NavClients
         setUser(data.user);
 
         const cleanEmail = email.trim().toLowerCase();
@@ -34,10 +35,12 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
           navigate('/');
         }
       } else {
-        alert("Login failed: " + data.error);
+        setError(data.error || "Incorrect credentials.");
       }
-    } catch (error) {
-      alert("Cannot connect to server. Check if Flask is running.");
+    } catch (err) {
+      setError("Sorry, a network error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,8 +53,8 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
             <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-              <input 
-                type="email" 
+              <input
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#1e293b] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500"
@@ -64,8 +67,8 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
             <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Password</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-              <input 
-                type="password" 
+              <input
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-[#1e293b] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-blue-500"
@@ -74,8 +77,19 @@ export default function Login({ setUser }: { setUser: (user: any) => void }) {
               />
             </div>
           </div>
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2">
-            Login <ArrowRight size={18} />
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-xl text-sm mb-4 flex items-center gap-3 animate-shake">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              {error}
+            </div>
+          )}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className={`w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 group ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            {loading ? 'Signing in...' : 'Login'} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
         <p className="mt-8 text-center text-slate-400 text-sm">

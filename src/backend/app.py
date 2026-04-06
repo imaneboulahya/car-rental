@@ -8,6 +8,7 @@ import sys
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
+from flask_bcrypt import Bcrypt
 
 # --- 1. ENVIRONMENT & ENCODING FIXES ---
 load_dotenv()
@@ -17,6 +18,7 @@ if sys.platform == "win32":
     os.environ['PGCLIENTENCODING'] = 'utf-8'
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 # Allows React (Port 3000) to communicate with Flask (Port 8080)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -31,29 +33,28 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # --- 3. EMAIL CONFIGURATION (SMTP) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME", "ocationvoiture@gmail.com")
-app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD", "ffes ncsx ybuv thiw")
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
 
 # --- 4. DATABASE CONFIGURATION (PostgreSQL) ---
-username = os.getenv("DB_USERNAME", "postgres")
-password = os.getenv("DB_PASSWORD", "123456789")
-database = os.getenv("DB_NAME", "test26_db")
-db_host = os.getenv("DB_HOST", "localhost")
-db_port = os.getenv("DB_PORT", "5432")
+username = os.getenv("DB_USERNAME")
+password = os.getenv("DB_PASSWORD")
+database = os.getenv("DB_NAME")
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
 
 # Encode password to handle special characters (@, #, etc.)
-encoded_password = urllib.parse.quote_plus(password)
+encoded_password = urllib.parse.quote_plus(password) if password else ""
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     f'postgresql://{username}:{encoded_password}@{db_host}:{db_port}/{database}'
     '?client_encoding=utf8'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "luxdrive-secure-key-2026")
-
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 db.init_app(app)
 
 # --- 5. DATABASE INITIALIZATION ---
@@ -93,31 +94,46 @@ def login():
         return jsonify({"error": "Email and password are required"}), 400
 
     user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"error": "Invalid email or password."}), 401
 
-    if user and user.password == password:
-        return jsonify({
-            "message": "Login successful",
-            "user": user.to_dict() # Dictionary includes id and image_url
-        }), 200
-    return jsonify({"error": "Invalid email or password"}), 401
+    try:
+        if bcrypt.check_password_hash(user.password, password):
+            return jsonify({
+                "message": "Login successful",
+                "user": user.to_dict()
+            }), 200
+        return jsonify({"error": "Invalid email or password."}), 401
+    except Exception:
+        return jsonify({"error": "Invalid email or password."}), 401
 
 @app.route('/users', methods=['POST'])
 def signup():
     data = request.json
     if not data or not all(k in data for k in ("username", "email", "password")):
-        return jsonify({"error": "Missing required fields"}), 400
+        return jsonify({"error": "Please fill in all fields."}), 400
+
+    # 1. Check if user already exists
+    existing_user = User.query.filter_by(email=data.get('email')).first()
+    if existing_user:
+        return jsonify({"error": "This email is already registered."}), 400
+    # ---------------------------
+
     try:
+        # Hachage du mot de passe
+        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        
         new_user = User(
             username=data['username'], 
             email=data['email'], 
-            password=data['password'] 
+            password=hashed_password 
         )
         db.session.add(new_user)
         db.session.commit()
         return jsonify(new_user.to_dict()), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Could not create user", "details": str(e)}), 400
+        return jsonify({"error": "Failed to create account.", "details": str(e)}), 400
 
 # --- 8. USER PROFILE UPDATES ---
 
@@ -158,6 +174,34 @@ def upload_avatar(user_id):
         
         return jsonify(user.to_dict()), 200
     return jsonify({"error": "Upload failed"}), 400
+
+@app.route('/api/users/<int:user_id>/password', methods=['PUT'])
+def update_password(user_id):
+    """Securely updates the user password with Bcrypt."""
+    data = request.json
+    current_pwd = data.get('currentPassword')
+    new_pwd = data.get('newPassword')
+
+    if not current_pwd or not new_pwd:
+        return jsonify({"error": "Missing current or new password"}), 400
+
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Verify current password
+        if not bcrypt.check_password_hash(user.password, current_pwd):
+            return jsonify({"error": "Incorrect current password"}), 401
+
+        # Hash and save new password
+        user.password = bcrypt.generate_password_hash(new_pwd).decode('utf-8')
+        db.session.commit()
+
+        return jsonify({"message": "Password updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Password update failed", "details": str(e)}), 500
 
 # --- 9. FLEET & RESERVATION ROUTES ---
 
